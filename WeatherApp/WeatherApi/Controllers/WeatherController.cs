@@ -7,6 +7,7 @@ namespace WeatherApi.Controllers
     [ApiController]
     public class WeatherController : ControllerBase
     {
+        
         [HttpGet]
         public IActionResult Get()
         {

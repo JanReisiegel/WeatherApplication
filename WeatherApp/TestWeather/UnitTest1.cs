@@ -6,7 +6,7 @@ namespace TestWeather
     [TestClass]
     public class UnitTest1
     {
-        WeatherController weatherController = new WeatherController();
+        private readonly WeatherController weatherController = new WeatherController();
         [TestMethod]
         public void Test1()
         {
