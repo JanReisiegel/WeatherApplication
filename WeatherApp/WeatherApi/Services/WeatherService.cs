@@ -1,4 +1,5 @@
 ﻿using OpenWeatherMap;
+using OpenWeatherMap.Models;
 
 namespace WeatherApi.Services
 {
@@ -13,13 +14,17 @@ namespace WeatherApi.Services
         };
         private static IOpenWeatherMapService openWeatherMapService = new OpenWeatherMapService(openWeatherMapOptions);
 
+        private readonly LocationFormatTransform _locationFormatTransform;
+
         public WeatherService()
         {
+            _locationFormatTransform = new LocationFormatTransform();
         }
 
-        public string GetWeather(string city)
+        public WeatherInfo GetWeather(string address)
         {
-            var weather = openWeatherMapService.
+            var point = _locationFormatTransform.TransformAdressToPoint(address);
+            return openWeatherMapService.GetCurrentWeatherAsync(point.Latitude, point.Longitude).Result;
         }
     }
 }
