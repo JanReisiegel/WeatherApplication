@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WeatherApi.Data;
 using WeatherApi.Services;
 
 namespace WeatherApi.Controllers
@@ -9,9 +10,11 @@ namespace WeatherApi.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly WeatherService _weatherService;
-        public WeatherController()
+        private readonly AppDbContext _context;
+        public WeatherController(AppDbContext context)
         {
-            _weatherService = new WeatherService();
+            _context = context;
+            _weatherService = new WeatherService(context);
         }
         [HttpGet]
         public IActionResult Get()
@@ -27,9 +30,9 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("weather")]
-        public IActionResult GetWeather([FromQuery]string location)
+        public IActionResult GetWeatherForcast([FromQuery]double latitude, [FromQuery]double longitude)
         {
-            var rweather = _weatherService.GetWeather(location);
+            var rweather = _weatherService.GetWeatherForcast5Days(latitude, longitude);
             return Ok(rweather);
         }
     }

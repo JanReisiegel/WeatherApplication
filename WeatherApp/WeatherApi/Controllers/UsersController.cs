@@ -66,7 +66,7 @@ namespace WeatherApi.Controllers
 
         // POST api/<ValuesController>
         [HttpPost("register")]
-        public async IActionResult Post([FromBody] UserIM input)
+        public async Task<IActionResult> Post([FromBody] UserIM input)
         {
             var emailInDb = _context.Users.Where(x => x.Email == input.Email).FirstOrDefault();
             if (emailInDb != null)
@@ -94,6 +94,7 @@ namespace WeatherApi.Controllers
                 //přidat potvrzení mailu protože to není potřeba řešit
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var confirmResult = await _userManager.ConfirmEmailAsync(user, code);
+                return Ok("User created");
             }
             else
             {

@@ -29,9 +29,9 @@ namespace WeatherApi.Services
         }
         public async Task<WeatherForecast> GetWeatherForcast5Days(double latitude, double longitude)
         {
-            WeatherForecast result = _context.WeatherForecasts.Where(x=> x.Latitude == latitude && x.Longitude == longitude).FirstOrDefault();
+            //WeatherForecast result = _context.WeatherForecasts.Where(x=> x.Latitude == latitude && x.Longitude == longitude).FirstOrDefault();
             
-            
+            var result = openWeatherMapService.GetWeatherForecast5Async(latitude,longitude).Result;
             return result;
         }
     }
