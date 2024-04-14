@@ -8,6 +8,9 @@
       "sslPort": 44382
     }
   },
+  "ConnectionStrings": {
+    "WeatherDb": "Data Source=weather.db;Version=3;"
+  },
   "profiles": {
     "http": {
       "commandName": "Project",

@@ -20,9 +20,16 @@ namespace WeatherApi.Controllers
         }
 
         [HttpGet("weather")]
-        public IActionResult GetWeather([FromQuery] string address)
+        public IActionResult GetWeather([FromQuery]double latitude, [FromQuery]double longitude)
         {
-            var rweather = _weatherService.GetWeather(address);
+            var rweather = _weatherService.GetWeather(latitude, longitude);
+            return Ok(rweather);
+        }
+
+        [HttpGet("weather")]
+        public IActionResult GetWeather([FromQuery]string location)
+        {
+            var rweather = _weatherService.GetWeather(location);
             return Ok(rweather);
         }
     }
