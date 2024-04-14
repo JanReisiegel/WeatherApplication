@@ -13,7 +13,7 @@ namespace WeatherApi.Data
         //weatherforcast items to database
         //weatherInfo to database
         //savedLocation in DBs
-        public DbSet<WeatherForecastItem> WeatherForecasts { get; set; }
+        public DbSet<MyWeatherForecast> WeatherForecasts { get; set; }
         public DbSet<WeatherInfo> WeatherInfos { get; set; }
         public DbSet<SavedLocation> SavedLocations { get; set; }
 

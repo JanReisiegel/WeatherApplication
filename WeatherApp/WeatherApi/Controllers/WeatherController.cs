@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WeatherApi.Data;
+using WeatherApi.Models;
 using WeatherApi.Services;
 
 namespace WeatherApi.Controllers
@@ -25,13 +26,20 @@ namespace WeatherApi.Controllers
         [HttpGet("weather")]
         public IActionResult GetWeather([FromQuery]double latitude, [FromQuery]double longitude)
         {
-            var rweather = _weatherService.GetWeather(latitude, longitude);
+            var rweather = _weatherService.GetActualWeather(latitude, longitude);
+            return Ok(rweather);
+        }
+        [HttpGet("weather")]
+        public IActionResult GetWeather([FromQuery]string CityName)
+        {
+            var coordinates = LocationTransformation.CityNameToCoordinates(CityName).Result;
+            var rweather = _weatherService.GetActualWeather(coordinates[0], coordinates[1]);
             return Ok(rweather);
         }
 
         [HttpGet("weather")]
         public IActionResult GetWeatherForcast([FromQuery]double latitude, [FromQuery]double longitude)
-        {
+        {   
             var rweather = _weatherService.GetWeatherForcast5Days(latitude, longitude);
             return Ok(rweather);
         }
