@@ -5,11 +5,11 @@ namespace Weather.Models
 {
     public class Location
     {
-        [Required] //přidat uniq
+        [Key] //přidat uniq
         public int Id { get; set; }
-        [Key]
+        [Required]
         public double Latitude { get; set; }
-        [Key]
+        [Required]
         public double Longitude { get; set; }
         [Required]
         public string? CityName { get; set; }

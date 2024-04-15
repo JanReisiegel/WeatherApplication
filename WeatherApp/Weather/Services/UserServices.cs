@@ -1,7 +1,9 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Weather.Data;
 using Weather.Models;
 
 namespace Weather.Services
@@ -9,9 +11,11 @@ namespace Weather.Services
     public class UserServices
     {
         private readonly IConfiguration _config;
-        public UserServices(IConfiguration config)
+        private readonly AppDbContext _context;
+        public UserServices(IConfiguration config, AppDbContext context)
         {
             _config = config;
+            _context = context;
         }
         public string GenerateJwtToken(ApplicationUser user)
         {
@@ -31,6 +35,11 @@ namespace Weather.Services
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+        public ApplicationUser GetUserByEmail(string email)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.Email == email);
+            return user;
         }
     }
 }

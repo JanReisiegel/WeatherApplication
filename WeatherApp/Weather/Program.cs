@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Weather.Data;
 using Weather.Models;
+using Weather.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(Constants.PAY_POLICY, policy => policy.RequireClaim("paid_account", "true"));
 });
 
+builder.Services.AddScoped<UserServices>();
+builder.Services.AddScoped<WeatherServices>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,6 +57,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 

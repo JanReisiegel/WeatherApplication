@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Weather.Models;
 
 namespace Weather.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -21,6 +22,10 @@ namespace Weather.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Location>(entity =>
+            {
+                entity.HasIndex(x => new { x.Latitude, x.Longitude }).IsUnique();
+            });
             modelBuilder.Entity<SavedLocation>(entity =>
             {
                 entity.HasOne(x => x.User).WithMany(x => x.SavedLocations).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
