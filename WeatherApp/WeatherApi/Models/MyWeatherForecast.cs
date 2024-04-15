@@ -3,9 +3,11 @@ using OpenWeatherMap.Models;
 
 namespace WeatherApi.Models
 {
-    public class MyWeatherForecast : WeatherForecastBase
+    public class MyWeatherForecast
     {
-        [JsonProperty("list")]
+        public string CityName { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public ICollection<WeatherForecastItem> Items { get; set; } = new List<WeatherForecastItem>();
         public DateTime AcquiredDate { get; set; }
 

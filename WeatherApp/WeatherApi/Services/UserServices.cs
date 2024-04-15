@@ -2,52 +2,57 @@
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using SQLitePCL;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using WeatherApi.Data;
 using WeatherApi.Models;
 
 namespace WeatherApi.Services
 {
-    public class UserServices<T> : IProfileService where T : ApplicationUser
+    public class UserServices
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserClaimsPrincipalFactory<T> _claimsFactory;
+        private readonly IConfiguration _configuration;
 
-        public UserServices(UserManager<ApplicationUser> userManager, IUserClaimsPrincipalFactory<T> claimsFactory)
+        public UserServices(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
-            _claimsFactory = claimsFactory;
+            _configuration = configuration;
         }
 
-        public async Task GetProfileDataAsync(ProfileDataRequestContext context)
+        public string GetJWTToken(ApplicationUser user)
         {
-            var sub = context.Subject.Claims.FirstOrDefault(x => x.Type == "sub");
-            if (sub == null)
+            var claims = new List<Claim>
             {
-                throw new Exception("No sub Claim provided");
-            }
-            var user = await _userManager.FindByIdAsync(sub.Value);
-            if (user != null)
+                new Claim("id", user.Id),
+                new Claim("email", user.Email),
+                new Claim("username", user.UserName),
+                new Claim("paid", user.PaidAccount? "true": "false")
+            };
+
+            List<Claim> userClaims = _userManager.GetClaimsAsync(user).Result.ToList();
+            foreach (var claim in userClaims)
             {
-                context.IssuedClaims.Add(new Claim("email", user.Email));
-                context.IssuedClaims.Add(new Claim("username", user.UserName));
-                context.IssuedClaims.Add(new Claim("prefered_username", $"{user.FirstName} {user.LastName}"));
-                context.IssuedClaims.Add(new Claim("paid", user.PaidAccount ? "true" : "false"));
-
-                List<Claim> userClaims = _userManager.GetClaimsAsync(user).Result.ToList();
-                foreach (var claim in userClaims)
-                {
-                    context.IssuedClaims.Add(new Claim(claim.Type, claim.Value));
-                }
+                claims.Add(new Claim(claim.Type, claim.Value));
             }
-        }
 
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 
-        public Task IsActiveAsync(IsActiveContext context)
-        {
-            context.IsActive = true;
-            return Task.FromResult(0);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddHours(2);
+
+            var token = new JwtSecurityToken(
+                _configuration["Jwt:Issuer"],
+                _configuration["Jwt:Issuer"],
+                claims,
+                expires: expires,
+                signingCredentials: credentials
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

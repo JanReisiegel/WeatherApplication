@@ -23,13 +23,13 @@ namespace WeatherApi.Controllers
             return Ok("Hello World");
         }
 
-        [HttpGet("weather")]
+        [HttpGet("Actual/ByCoordinates")]
         public IActionResult GetWeather([FromQuery]double latitude, [FromQuery]double longitude)
         {
             var rweather = _weatherService.GetActualWeather(latitude, longitude);
             return Ok(rweather);
         }
-        [HttpGet("weather")]
+        [HttpGet("Actual/ByCityName")]
         public IActionResult GetWeather([FromQuery]string CityName)
         {
             var coordinates = LocationTransformation.CityNameToCoordinates(CityName).Result;
@@ -37,10 +37,10 @@ namespace WeatherApi.Controllers
             return Ok(rweather);
         }
 
-        [HttpGet("weather")]
-        public IActionResult GetWeatherForcast([FromQuery]double latitude, [FromQuery]double longitude)
+        [HttpGet("Forecast")]
+        public ActionResult<MyWeatherForecast> GetWeatherForcast([FromQuery]double latitude, [FromQuery]double longitude)
         {   
-            var rweather = _weatherService.GetWeatherForcast5Days(latitude, longitude);
+            MyWeatherForecast rweather = _weatherService.GetWeatherForcast5Days(latitude, longitude).Result;
             return Ok(rweather);
         }
     }

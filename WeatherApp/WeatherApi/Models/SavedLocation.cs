@@ -14,8 +14,8 @@ namespace WeatherApi.Models
         [Required]
         public double Latitude { get; set; }
         [Required]
-        public string Longitude { get; set; } = "";
+        public double Longitude { get; set; }
         [Required]
-        public string LocationName { get; set; } = "";
+        public double LocationName { get; set; }
     }
 }

@@ -42,19 +42,22 @@ namespace WeatherApi.Services
         }
         public async Task<MyWeatherForecast> GetWeatherForcast5Days(double latitude, double longitude)
         {
-            var weatherForcast = _context.WeatherForecasts.Where(x => x.City.Coordinates.Latitude == latitude && x.City.Coordinates.Longitude == longitude && x.AcquiredDate.Date == DateTime.Now.Date).FirstOrDefault();
-            if (weatherForcast != null)
+            //var weatherForcast = _context.WeatherForecasts.Where(x => x.Latitude == latitude && x.Longitude == longitude && x.AcquiredDate.Date == DateTime.Now.Date).FirstOrDefault();
+            /*if (weatherForcast != null)
             {
                 return weatherForcast;
-            }
+            }*/
             var result = openWeatherMapService.GetWeatherForecast5Async(latitude,longitude).Result;
             MyWeatherForecast myWeatherForcast = new MyWeatherForecast
             {
+                CityName = result.City.Name,
+                Latitude = result.City.Coordinates.Latitude,
+                Longitude = result.City.Coordinates.Longitude,
                 AcquiredDate = DateTime.Now
             };
             result.Items.ToList().ForEach(x => myWeatherForcast.Items.Add(x));
-            _context.WeatherForecasts.Add(myWeatherForcast);
-            await _context.SaveChangesAsync();
+            //_context.WeatherForecasts.Add(myWeatherForcast);
+            //await _context.SaveChangesAsync();
             return myWeatherForcast;
         }
     }

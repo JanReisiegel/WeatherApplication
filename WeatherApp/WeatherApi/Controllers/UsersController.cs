@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using WeatherApi.Data;
 using WeatherApi.Models;
@@ -19,17 +23,20 @@ namespace WeatherApi.Controllers
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
         public UsersController(SignInManager<ApplicationUser> signInManager, 
             AppDbContext context, IUserStore<ApplicationUser> userStore, 
             IUserEmailStore<ApplicationUser> userEmailStore,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration)
         {
             _signInManager = signInManager;
             _context = context;
             _userStore = userStore;
             _userEmailStore = userEmailStore;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
 
@@ -47,19 +54,38 @@ namespace WeatherApi.Controllers
             {
                 return BadRequest();
             }
-
             var userName = login.Contains('@')?_context.Users.Where(x=>x.Email==login).Select(x=>x.UserName).FirstOrDefault() 
                 : _context.Users.Where(x=>x.UserName==login).Select(x=>x.UserName).FirstOrDefault();
-
-            var result = await _signInManager.PasswordSignInAsync(userName, password, rememberMe, false);
-
-            if (result.Succeeded)
+            if (userName == null)
             {
-                return Ok("User authenticated");
+                return NotFound("User not found");
             }
-            if(result.IsLockedOut)
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
             {
-                return StatusCode(423, "User is locked out");
+                return NotFound("User not found");
+            }
+            var result = await _userManager.CheckPasswordAsync(user, password);
+            if(result)
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);  
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim("username", user.UserName),
+                        new Claim("email", user.Email),
+                        new Claim("identifikator", user.Id),
+                        new Claim("paid", user.PaidAccount.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(2),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                return Ok(new { Token = tokenString });
             }
             return Unauthorized("User cannot be authorized");
         }
@@ -74,26 +100,25 @@ namespace WeatherApi.Controllers
                 return BadRequest("Email already exists");
             }
 
-            var user = Activator.CreateInstance<ApplicationUser>();
+            var user = new ApplicationUser
+            {
+                Email = input.Email,
+                NormalizedEmail = input.Email.ToUpper(),
+                EmailConfirmed = true,
+                UserName = input.UserName,
+                NormalizedUserName = input.UserName.ToUpper(),
+                PaidAccount = false,
+                Id = Guid.NewGuid().ToString()
+            };
 
-            user.Email = input.Email;
-            user.UserName = input.UserName;
-            user.FirstName = input.FirstName;
-            user.LastName = input.LastName;
-            user.PhoneNumber = input.PhoneNumber;
-
-            await _userStore.UpdateAsync(user, CancellationToken.None);
-
-            await _userStore.SetUserNameAsync(user, user.UserName, CancellationToken.None);
-            await _userEmailStore.SetEmailAsync(user, user.Email, CancellationToken.None);
             var result = await _userManager.CreateAsync(user, input.Password);
 
             if (result.Succeeded)
             {
-                var userId = await _userManager.GetUserIdAsync(user);
-                //přidat potvrzení mailu protože to není potřeba řešit
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmResult = await _userManager.ConfirmEmailAsync(user, code);
+                if (user.PaidAccount)
+                {
+                    await _userManager.AddClaimAsync(user, new Claim("PaidAccount", "true"));
+                }
                 return Ok("User created");
             }
             else
@@ -104,8 +129,9 @@ namespace WeatherApi.Controllers
         }
 
         // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize]
+        [HttpPut("pay")]
+        public void Pay(int id, [FromBody] string value)
         {
         }
 
