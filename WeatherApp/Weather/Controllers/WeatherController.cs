@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Weather.Services;
 
 namespace Weather.Controllers
 {
@@ -7,5 +8,12 @@ namespace Weather.Controllers
     [ApiController]
     public class WeatherController : ControllerBase
     {
+        [HttpGet]
+        public IActionResult Get([FromQuery] double latitude, [FromQuery] double longitude)
+        {
+            var weather = new WeatherServices().GetActualWeather(latitude, longitude);
+
+            return Ok(weather);
+        }
     }
 }
