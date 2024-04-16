@@ -19,5 +19,11 @@ namespace Weather.Services
             var openWeatherMapService = new OpenWeatherMapService(openWeatherMapOptions);
             return openWeatherMapService.GetCurrentWeatherAsync(latitude, longitude).Result;
         }
+
+        public WeatherForecast GetWeatherForecast5Days(double latitude, double longitude)
+        {
+            var openWeatherMapService = new OpenWeatherMapService(openWeatherMapOptions);
+            return openWeatherMapService.GetWeatherForecast5Async(latitude, longitude).Result;
+        }
     }
 }

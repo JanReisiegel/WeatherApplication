@@ -3,6 +3,6 @@
 using Weather.Services;
 
 WeatherServices _weather = new WeatherServices();
-var result = _weather.GetActualWeather(50.08804, 14.42076);
+var result = _weather.GetWeatherForecast5Days(50.08804, 14.42076);
 
 Console.WriteLine($"Weather in Prague: ");
