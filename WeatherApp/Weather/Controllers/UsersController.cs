@@ -16,11 +16,13 @@ namespace Weather.Controllers
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
         private readonly UserServices _userService;
-        public UsersController(IConfiguration config, AppDbContext context, UserServices userService)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public UsersController(IConfiguration config, AppDbContext context, UserServices userService, UserManager<ApplicationUser> userManager)
         {
             _config = config;
             _context = context;
             _userService = userService;
+            _userManager = userManager;
         }  
 
         [HttpPost("login")]
@@ -34,6 +36,26 @@ namespace Weather.Controllers
                 return Ok(new { Token = token });
             }
             return Unauthorized();
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        {
+            var user = new ApplicationUser
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber,
+                PaidAccount = false,
+                NormalizedEmail = model.Email.ToUpper(),
+                NormalizedUserName = model.UserName.ToUpper(),
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if(result.Succeeded)
+            {
+                return Ok("User was Created");
+            }
+            return BadRequest(result.Errors);
         }
     }
 }

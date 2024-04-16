@@ -23,20 +23,21 @@ namespace Weather.Models
         public int ForecastId { get; set; }
         [ForeignKey("ForecastId")]
         public MyWeatherForecast? Forecast { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime? DateTime { get; set; }
         //srážky
-        public Length Rain { get; set; }
+        public double? Rain1h { get; set; }
+        public double? Rain3h { get; set; }
         //Teplota
-        public double Temperature { get; set; }
-        public double FeelsTemperature { get; set; }
-        public double MinTemperature { get; set; }
-        public double MaxTemperature { get; set; }
-        public double Pressure { get; set; }
-        public double Humidity { get; set; }
+        public double? Temperature { get; set; }
+        public double? FeelsTemperature { get; set; }
+        public double? MinTemperature { get; set; }
+        public double? MaxTemperature { get; set; }
+        public double? Pressure { get; set; }
+        public double? Humidity { get; set; }
         //vítr
-        public double WindSpeed { get; set; }
-        public double Directory { get; set; }
+        public double? WindSpeed { get; set; }
+        public double? Directory { get; set; }
         //icon
-        public ConditionGroup Condition { get; set; }
+        public ConditionGroup? Condition { get; set; }
     }
 }

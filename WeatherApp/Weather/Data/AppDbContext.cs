@@ -30,6 +30,7 @@ namespace Weather.Data
             {
                 entity.HasOne(x => x.User).WithMany(x => x.SavedLocations).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(x => x.Location).WithMany(x => x.SavedLocations).HasForeignKey(x => x.LocationId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasKey(x => new { x.LocationId, x.UserId });
             });
             modelBuilder.Entity<MyWeatherForecast>(entity =>
             {
