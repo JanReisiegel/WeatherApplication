@@ -12,15 +12,15 @@ namespace Weather.Models
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }
         //teplota
-        public Temperature Temperature { get; set; }
-        public Temperature FeelsTemperature { get; set; }
-        public Pressure Pressure { get; set; }
+        public double Temperature { get; set; }
+        public double FeelsTemperature { get; set; }
+        public double Pressure { get; set; }
+        public double Humidity { get; set; }
         //vítr
-        public Speed WindSpeed { get; set; }
-        public Angle Directory { get; set; }
+        public double WindSpeed { get; set; } //m/s
+        public double Directory { get; set; } //°
         //mraky
-        public Ratio CloudsNow { get; set; }
-        public Ratio CloudsToday { get; set; }
+        public double CloudsNow { get; set; } //procenta
         //slunce
         public DateTime Sunrise { get; set; }
         public DateTime Sunset { get; set; }
