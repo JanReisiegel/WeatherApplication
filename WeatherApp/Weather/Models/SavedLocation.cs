@@ -11,5 +11,6 @@ namespace Weather.Models
         public string UserId { get; set; } = "";
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }
+        public string CustomName { get; set; } = "";
     }
 }

@@ -5,7 +5,7 @@ namespace Weather.Models
 {
     public class Location
     {
-        [Key] //přidat uniq
+        [Key]
         public int Id { get; set; }
         [Required]
         public double Latitude { get; set; }
@@ -13,8 +13,6 @@ namespace Weather.Models
         public double Longitude { get; set; }
         [Required]
         public string? CityName { get; set; }
-        [Required]
-        public double LocationName { get; set; }
 
         public ICollection<SavedLocation> SavedLocations { get; set; }
         public ICollection<MyWeatherForecast> MyWeatherForecasts { get; set;}

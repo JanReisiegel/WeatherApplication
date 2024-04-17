@@ -29,9 +29,9 @@ namespace Weather.Controllers
             return Ok(weather);
         }
         [HttpGet("history")]
-        public IActionResult GetHistory([FromQuery] double latitude, [FromQuery] double longitude)
+        public IActionResult GetHistory([FromQuery] double latitude, [FromQuery] double longitude, string from, string to)
         {
-            var weather = _weatherServices.GetWeatherHistory(latitude, longitude);
+            var weather = _weatherServices.GetWeatherHistoryAsync(latitude, longitude, DateTime.Parse(from), DateTime.Parse(to));
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
@@ -48,16 +48,5 @@ namespace Weather.Controllers
             }
             return Ok(weather);
         }
-        [HttpGet("forecast/history")]
-        public IActionResult GetForecastHistory([FromQuery] double latitude, [FromQuery] double longitude)
-        {
-            var weather = _weatherServices.GetWeatherForecastHistory(latitude, longitude);
-            if (weather == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
-            }
-            return Ok(weather);
-        }
-
     }
 }
