@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using WeatherApi.Controllers;
-
 namespace TestWeather
 {
     [TestClass]
