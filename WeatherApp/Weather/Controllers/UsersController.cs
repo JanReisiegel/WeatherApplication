@@ -23,6 +23,7 @@ namespace Weather.Controllers
             _context = context;
             _userService = userService;
             _userManager = userManager;
+
         }  
 
         [HttpPost("login")]
