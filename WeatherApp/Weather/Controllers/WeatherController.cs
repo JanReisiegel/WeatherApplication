@@ -28,16 +28,6 @@ namespace Weather.Controllers
             }
             return Ok(weather);
         }
-        [HttpGet("history")]
-        public IActionResult GetHistory([FromQuery] double latitude, [FromQuery] double longitude, string from, string to)
-        {
-            var weather = _weatherServices.GetWeatherHistoryAsync(latitude, longitude, DateTime.Parse(from), DateTime.Parse(to));
-            if (weather == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
-            }
-            return Ok(weather);
-        }
         [HttpGet("forecast")]
         public IActionResult GetForecast([FromQuery] double latitude, [FromQuery] double longitude)
         {
