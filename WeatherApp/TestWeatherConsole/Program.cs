@@ -2,7 +2,7 @@
 
 using Weather.Services;
 
-WeatherServices _weather = new WeatherServices();
-var result = _weather.GetWeatherForecast5Days(50.08804, 14.42076);
+//WeatherServices _weather = new WeatherServices();
+//var result = _weather.GetWeatherForecast5Days(50.08804, 14.42076);
 
 Console.WriteLine($"Weather in Prague: ");

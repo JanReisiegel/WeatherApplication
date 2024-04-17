@@ -11,7 +11,7 @@ namespace Weather.Models
         public int LocationId { get; set; }
         [ForeignKey("LocationId")]
         public Location? Location { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime AcquireDateTime { get; set; }
 
         public ICollection<MyForecastItem>? ForecastItems { get; set; }
     }

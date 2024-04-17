@@ -25,5 +25,6 @@ namespace Weather.Models
         public DateTime Sunrise { get; set; }
         public DateTime Sunset { get; set; }
         public ConditionGroup Condition { get; set; }
+        public DateTime AcquireDateTime { get; set; }
     }
 }
