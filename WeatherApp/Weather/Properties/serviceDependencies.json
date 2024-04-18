@@ -3,6 +3,9 @@
     "identityapp1": {
       "ignored": "true",
       "type": "identityapp"
+    },
+    "apis1": {
+      "type": "apis"
     }
   }
 }
