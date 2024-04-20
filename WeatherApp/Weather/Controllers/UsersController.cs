@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Weather.Data;
 using Weather.Models;
 using Weather.Services;
 using Weather.ViewModels;
@@ -13,14 +13,10 @@ namespace Weather.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly AppDbContext _context;
         private readonly UserServices _userService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UsersController(IConfiguration config, AppDbContext context, UserServices userService, UserManager<ApplicationUser> userManager)
+        public UsersController(UserServices userService, UserManager<ApplicationUser> userManager)
         {
-            _config = config;
-            _context = context;
             _userService = userService;
             _userManager = userManager;
 

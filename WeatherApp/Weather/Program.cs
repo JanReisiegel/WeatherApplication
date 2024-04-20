@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Weather.Data;
 using Weather.Models;
 using Weather.Services;
 
@@ -17,11 +17,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=weather.db"));
 
-builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddDefaultTokenProviders()
+    .AddUserStore<JsonUserStore>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -45,6 +44,9 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddScoped<UserServices>();
 builder.Services.AddScoped<WeatherServices>();
+builder.Services.AddScoped<LocationServices>();
+builder.Services.AddScoped<LocationTransformation>();
+builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
 
 var app = builder.Build();
 

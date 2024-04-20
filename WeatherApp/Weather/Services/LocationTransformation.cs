@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Weather.Models;
+using Weather.ViewModels;
 
 namespace Weather.Services
 {
@@ -9,7 +11,7 @@ namespace Weather.Services
         {
             var httpClient = new HttpClient();
             
-            var url = $"https://nominatim.openstreetmap.org/reverse?format=json&lat={location.Latitude}&lon={location.Longitude}";
+            var url = $"https://api.opencagedata.com/geocode/v1/json&q={location.Latitude}%2C{location.Longitude}&key={Constants.OpenGeoCodeApiKey}";
             var response = httpClient.GetAsync(url).Result;
 
             if(response.IsSuccessStatusCode)
@@ -22,21 +24,26 @@ namespace Weather.Services
             }
         }
 
-        public void GetCoordinates(ref Location location)
+        public async Task<Location> GetCoordinates(string cityName)
         {
             var httpClient = new HttpClient();
-            
-            var url = $"https://nominatim.openstreetmap.org/search?format=json&q={location.CityName}";
-            var response = httpClient.GetAsync(url).Result;
+            httpClient.DefaultRequestHeaders.Add("WeatherAPI", "ASP.NET Web API");
+            var url = $"https://api.opencagedata.com/geocode/v1/json?q={cityName}&key={Constants.OpenGeoCodeApiKey}";
+            var response = await httpClient.GetAsync(url);
 
             if(response.IsSuccessStatusCode)
             {
-                var content = response.Content.ReadAsStringAsync().Result;
-                var weather = JArray.Parse(content);
-
-                location.Latitude = double.Parse(weather[0]["lat"].ToString());
-                location.Longitude = double.Parse(weather[0]["lon"].ToString());
+                var json = await response.Content.ReadAsStringAsync();
+                var res = JsonConvert.DeserializeObject<GeocodingClass>(json);
+                double latitude = res.Results.Average(x => x.Geometry.latitude);
+                double longitude = res.Results.Average(x => x.Geometry.longitude);
+                var location = new Location();
+                location.CityName = cityName;
+                location.Latitude = longitude;
+                location.Longitude = latitude;
+                return location;
             }
+            return null;
         }
     }
 }

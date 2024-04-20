@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Weather.Data;
 using Weather.Services;
 
 namespace Weather.Controllers
@@ -9,19 +8,17 @@ namespace Weather.Controllers
     [ApiController]
     public class WeatherController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly WeatherServices _weatherServices;
 
-        public WeatherController(AppDbContext context)
+        public WeatherController()
         {
-            _context = context;
-            _weatherServices = new WeatherServices(context);
+            _weatherServices = new WeatherServices();
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery] double latitude, [FromQuery] double longitude)
+        public IActionResult Get([FromQuery] string cityName)
         {
-            var weather = _weatherServices.GetActualWeather(latitude, longitude);
+            var weather = _weatherServices.GetActualWeather(cityName);
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
@@ -29,9 +26,9 @@ namespace Weather.Controllers
             return Ok(weather);
         }
         [HttpGet("forecast")]
-        public IActionResult GetForecast([FromQuery] double latitude, [FromQuery] double longitude)
+        public IActionResult GetForecast([FromQuery] string cityName)
         {
-            var weather = _weatherServices.GetWeatherForecast5Days(latitude, longitude);
+            var weather = _weatherServices.GetWeatherForecast5Days(cityName);
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");

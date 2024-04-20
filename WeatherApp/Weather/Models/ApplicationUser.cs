@@ -5,6 +5,6 @@ namespace Weather.Models
     public class ApplicationUser : IdentityUser
     {
         public bool PaidAccount { get; set; } = false;
-        public ICollection<SavedLocation>? SavedLocations { get; set; }
+        public List<Location> SavedLocations { get; set; } =new List<Location>();
     }
 }
