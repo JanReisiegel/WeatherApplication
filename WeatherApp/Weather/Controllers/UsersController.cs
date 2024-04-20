@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -51,6 +52,19 @@ namespace Weather.Controllers
             if(result.Succeeded)
             {
                 return Ok("User was Created");
+            }
+            return BadRequest(result.Errors);
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var result = await _userManager.DeleteAsync(user);
+            if(result.Succeeded)
+            {
+                return Ok("User was deleted");
             }
             return BadRequest(result.Errors);
         }

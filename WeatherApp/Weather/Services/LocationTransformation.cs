@@ -27,7 +27,6 @@ namespace Weather.Services
         public async Task<Location> GetCoordinates(string cityName)
         {
             var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("WeatherAPI", "ASP.NET Web API");
             var url = $"https://api.opencagedata.com/geocode/v1/json?q={cityName}&key={Constants.OpenGeoCodeApiKey}";
             var response = await httpClient.GetAsync(url);
 

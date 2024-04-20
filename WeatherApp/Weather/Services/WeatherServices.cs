@@ -10,12 +10,10 @@ namespace Weather.Services
     {
         private readonly OpenWeatherMapService _openWeatherMapService;
         private readonly LocationTransformation _locationTransformation = new LocationTransformation();
-        private readonly LocationServices _locationServices;
 
         public WeatherServices()
         {
             _openWeatherMapService = new OpenWeatherMapService(openWeatherMapOptions);
-            _locationServices = new LocationServices();
         }
 
         private OpenWeatherMapOptions openWeatherMapOptions = new OpenWeatherMapOptions
