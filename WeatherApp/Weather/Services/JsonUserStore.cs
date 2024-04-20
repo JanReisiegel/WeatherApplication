@@ -220,6 +220,13 @@ namespace Weather.Services
                     existingUser.PasswordHash = passwordHash;
                     await WriteToFileAsync(users);
                 }
+                else
+                {
+                    user.PasswordHash = passwordHash;
+                    users.Add(user);
+                    await WriteToFileAsync(users);
+                }
+                
             }
             finally
             {

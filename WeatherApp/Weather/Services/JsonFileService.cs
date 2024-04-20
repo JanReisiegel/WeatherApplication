@@ -6,7 +6,7 @@ namespace Weather.Services
     public class JsonFileService<T> : IJsonFileService<T> where T : class
     {
         private readonly string _path;
-        private readonly SemaphoreSlim _lock;
+        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1, 1);
 
         public JsonFileService(string path)
         {
