@@ -48,8 +48,19 @@ namespace Weather.Services
         public Task DeleteUser(ApplicationUser user)
         {
             var users = _userStore.ReadFromFileAsync().Result;
-            users.Remove(users.FirstOrDefault(x => x.Id == user.Id));
+            users.ForEach(x =>
+            {
+                if (x.Id == user.Id)
+                {
+                    users.Remove(x);
+                }
+            });
             return _userStore.WriteToFileAsync(users);
+        }
+        public Task<List<ApplicationUser>> GetAllUsers()
+        {
+            var users = _userStore.ReadFromFileAsync().Result;
+            return Task.FromResult(users);
         }
     }
 }

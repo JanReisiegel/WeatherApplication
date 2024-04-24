@@ -55,7 +55,7 @@ namespace Weather.Services
 
         public void Dispose()
         {
-            
+
         }
 
         public Task<ApplicationUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
@@ -134,103 +134,68 @@ namespace Weather.Services
 
         public async Task SetEmailAsync(ApplicationUser user, string? email, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    existingUser.Email = email;
-                    await WriteToFileAsync(users);
-                }
-            }
-            finally
-            {
-                _lock.Release();
+                existingUser.Email = email;
+                await UpdateAsync(existingUser, cancellationToken);
+                //await WriteToFileAsync(users);
             }
         }
 
         public async Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    existingUser.EmailConfirmed = confirmed;
-                    await WriteToFileAsync(users);
-                }
-            }
-            finally
-            {
-                _lock.Release();
+                existingUser.EmailConfirmed = confirmed;
+                await UpdateAsync(existingUser, cancellationToken);
+                //await WriteToFileAsync(users);
             }
         }
 
         public async Task SetNormalizedEmailAsync(ApplicationUser user, string? normalizedEmail, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    existingUser.NormalizedEmail = normalizedEmail;
-                    await WriteToFileAsync(users);
-                }
-            }
-            finally
-            {
-                _lock.Release();
+                existingUser.NormalizedEmail = normalizedEmail;
+                UpdateAsync(existingUser, cancellationToken);
+                //await WriteToFileAsync(users);
             }
         }
 
         public async Task SetNormalizedUserNameAsync(ApplicationUser user, string? normalizedName, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    existingUser.NormalizedUserName = normalizedName;
-                    await WriteToFileAsync(users);
-                }
-            }
-            finally
-            {
-                _lock.Release();
+                existingUser.NormalizedUserName = normalizedName;
+                await UpdateAsync(existingUser, cancellationToken);
+                //await WriteToFileAsync(users);
             }
         }
 
         public async Task SetPasswordHashAsync(ApplicationUser user, string? passwordHash, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    existingUser.PasswordHash = passwordHash;
-                    await WriteToFileAsync(users);
-                }
-                else
-                {
-                    user.PasswordHash = passwordHash;
-                    users.Add(user);
-                    await WriteToFileAsync(users);
-                }
-                
+                existingUser.PasswordHash = passwordHash;
+                await UpdateAsync(existingUser, cancellationToken);
+                //await WriteToFileAsync(users);
             }
-            finally
+            else
             {
-                _lock.Release();
+                user.PasswordHash = passwordHash;
+                users.Add(user);
+                await UpdateAsync(user, cancellationToken);
+                //await WriteToFileAsync(users);
             }
         }
 
@@ -244,7 +209,8 @@ namespace Weather.Services
                 if (existingUser != null)
                 {
                     existingUser.UserName = userName;
-                    await WriteToFileAsync(users);
+                    await UpdateAsync(existingUser, cancellationToken);
+                    //await WriteToFileAsync(users);
                 }
             }
             finally
@@ -255,24 +221,22 @@ namespace Weather.Services
 
         public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            await _lock.WaitAsync();
-            try
+            var users = await ReadFromFileAsync();
+            var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
             {
-                var users = await ReadFromFileAsync();
-                var existingUser = users.FirstOrDefault(u => u.Id == user.Id);
-                if (existingUser != null)
-                {
-                    users.Remove(existingUser);
-                    users.Add(user);
-                    await WriteToFileAsync(users);
-                    return IdentityResult.Success;
-                }
-                return IdentityResult.Failed(new IdentityError { Description = $"User with id {user.Id} not found" });
+                users.Remove(existingUser);
+                users.Add(user);
+                await WriteToFileAsync(users);
+                return IdentityResult.Success;
             }
-            finally
+            else if (existingUser == null)
             {
-                _lock.Release();
+                users.Add(user);
+                await WriteToFileAsync(users);
+                return IdentityResult.Success;
             }
+            return IdentityResult.Failed(new IdentityError { Description = $"User with id {user.Id} not found" });
         }
         public async Task<List<ApplicationUser>> ReadFromFileAsync()
         {

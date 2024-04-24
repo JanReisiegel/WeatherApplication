@@ -56,7 +56,7 @@ namespace Weather.Controllers
             return BadRequest(result.Errors);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpDelete]
         public async Task<IActionResult> DeleteUser()
         {
@@ -67,6 +67,63 @@ namespace Weather.Controllers
                 return Ok("User was deleted");
             }
             return BadRequest(result.Errors);
+        }
+
+        //[Authorize]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody] UserVM model)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            user.UserName =String.IsNullOrEmpty(model.UserName) ? user.UserName : model.UserName;
+            user.Email = String.IsNullOrEmpty(model.Email) ? user.UserName : model.Email;
+            user.PhoneNumber = String.IsNullOrEmpty(model.PhoneNumber) ? user.UserName : model.PhoneNumber;
+            user.SavedLocations =  model.Locations;
+            user.PaidAccount = model.PaidAccount;
+            var result = await _userManager.UpdateAsync(user);
+            if(result.Succeeded)
+            {
+                return Ok("User was updated");
+            }
+            return BadRequest(result.Errors);
+        }
+        //[Authorize]
+        [HttpGet("one")]
+        public async Task<ActionResult<UserVM>> GetUser()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if(user == null)
+            {
+                return NotFound();
+            }
+            var result = new UserVM
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Locations = user.SavedLocations,
+                PaidAccount = user.PaidAccount
+            };
+            return Ok(result);
+        }
+
+        [HttpGet("all")]
+        public ActionResult<List<UserVM>> GetAllUsers()
+        {
+            List<ApplicationUser> users = _userService.GetAllUsers().Result;
+            List<UserVM> usersVM = new List<UserVM>();
+            users.ForEach(user =>
+            {
+                usersVM.Add(new UserVM
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Locations = user.SavedLocations,
+                    PaidAccount = user.PaidAccount
+                });
+            });
+            return Ok(usersVM);
         }
     }
 }
