@@ -1,25 +1,28 @@
 import logo from "./logo.svg";
 import "./App.css";
 import "rsuite/dist/rsuite.min.css";
+import { AppProvider } from "./components/Auth/AppProvider";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Navigation from "./components/Layout/Navigation";
+import Unauthorized from "./components/General/Unauthorized";
+import { Col, Row } from "rsuite";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppProvider>
+      <BrowserRouter basename="/">
+        <Row>
+          <Col sx={24} sm={24} md={3} lg={2}></Col>
+          <Col sx={24} sm={24} md={18} lg={20}>
+            <Navigation />
+            <Routes>
+              <Route path="/" element={<Unauthorized />} />
+            </Routes>
+          </Col>
+          <Col sx={24} sm={24} md={3} lg={2}></Col>
+        </Row>
+      </BrowserRouter>
+    </AppProvider>
   );
 }
 
