@@ -1,7 +1,7 @@
 export const UserApi = {
-  login: "https://localhost:7248/api/user/login",
-  register: "https://localhost:7248/api/user/register",
-  logout: "https://localhost:7248/api/user/logout",
+  login: "https://localhost:7248/api/Users/login",
+  register: "https://localhost:7248/api/Users/register",
+  logout: "https://localhost:7248/api/Users/logout",
 };
 export const WeatherApi = {
   current: "https://localhost:7248/api/weather/current",

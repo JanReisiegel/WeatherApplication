@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import "rsuite/dist/rsuite.min.css";
 import { AppProvider } from "./components/Auth/AppProvider";

@@ -1,11 +1,44 @@
-import React, { useState } from "react";
-import { Button, Form, Modal, Nav, Popover, Whisper } from "rsuite";
+import axios from "axios";
+import React, { useState, useContext } from "react";
+import { Button, Form, Modal, Nav } from "rsuite";
+import { UserApi } from "../../configuration/API";
+import { AppContext } from "../Auth/AppProvider";
 
 const MenuLogin = () => {
-  const [dialog, setDialog] = useState(false);
+  const { dispatch } = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+
+  const signInAction = () => {
+    axios
+      .post(
+        UserApi.login,
+        {
+          email: email,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response.data);
+        dispatch({
+          type: "USER_FOUND",
+          payload: {
+            user: response.data.user,
+            token: response.data.token,
+          },
+        });
+      })
+      .catch((error) => {
+        //console.error(error);
+      });
+  };
 
   return (
     <>
@@ -17,7 +50,13 @@ const MenuLogin = () => {
         Přihlásit se
       </Nav.Item>
 
-      <Modal title="Přihlášení" open={visible}>
+      <Modal
+        title="Přihlášení"
+        open={visible}
+        backdrop={true}
+        onClose={() => setVisible(false)}
+        keyboard={true}
+      >
         <Modal.Header>
           <Modal.Title>Přihlášení</Modal.Title>
         </Modal.Header>
@@ -51,10 +90,7 @@ const MenuLogin = () => {
           <Button onClick={() => setVisible(false)} appearance="subtle">
             Zavřít
           </Button>
-          <Button
-            onClick={() => console.log(email, password)}
-            appearance="primary"
-          >
+          <Button onClick={() => signInAction()} appearance="primary">
             Přihlásit se
           </Button>
         </Modal.Footer>

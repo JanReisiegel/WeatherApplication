@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { Navbar, Nav } from "rsuite";
 import { Link, NavLink } from "react-router-dom";
 import {
@@ -8,11 +8,10 @@ import {
   LIGHT_THEME,
 } from "../Auth/AppProvider";
 import { MdContrast, MdDarkMode, MdLightMode } from "react-icons/md";
-import MenuLogin, { LoginModal } from "../Users/Login";
+import MenuLogin from "../Users/Login";
 
 const Navigation = (props) => {
   const { dispatch } = useContext(AppContext);
-  const [login, setLogin] = useState(false);
   return (
     <Navbar>
       <Navbar.Brand as={Link} to={"/"}>
@@ -35,14 +34,14 @@ const Navigation = (props) => {
           <Nav.Item
             icon={<MdLightMode />}
             onClick={(e) => dispatch({ type: LIGHT_THEME })}
-            disabled={props.theme == "light"}
+            disabled={props.theme === "light"}
           >
             Light
           </Nav.Item>
           <Nav.Item
             icon={<MdDarkMode />}
             onClick={(e) => dispatch({ type: DARK_THEME })}
-            disabled={props.theme == "dark"}
+            disabled={props.theme === "dark"}
           >
             Dark
           </Nav.Item>

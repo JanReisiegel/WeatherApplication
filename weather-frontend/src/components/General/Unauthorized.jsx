@@ -1,4 +1,4 @@
-import { Button, Col, Message } from "rsuite";
+import { Button, Message } from "rsuite";
 import { Link } from "react-router-dom";
 
 const Unauthorized = ({ redirectToUrl }) => {

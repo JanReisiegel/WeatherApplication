@@ -48,7 +48,19 @@ builder.Services.AddScoped<LocationServices>();
 builder.Services.AddScoped<LocationTransformation>();
 builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();
