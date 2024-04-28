@@ -1,7 +1,7 @@
 namespace TestWeather
 {
     [TestClass]
-    public class UnitTest1
+    public class LocationsTest
     {
         [TestMethod]
         public void Test1()

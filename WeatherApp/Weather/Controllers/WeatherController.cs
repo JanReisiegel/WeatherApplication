@@ -17,7 +17,7 @@ namespace Weather.Controllers
             _weatherServices = new WeatherServices();
         }
 
-        [HttpGet]
+        [HttpGet("actual")]
         public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName)
         {
             var weather = await _weatherServices.GetActualWeather(cityName);
