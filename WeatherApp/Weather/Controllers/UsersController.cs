@@ -29,7 +29,9 @@ namespace Weather.Controllers
         public IActionResult Login([FromBody] LoginModel model)
         {
             var user = _userService.GetUserByEmail(model.Email);
-            var verified = new PasswordHasher<ApplicationUser>().VerifyHashedPassword(null, user.PasswordHash, model.Password);
+            var hasher = new PasswordHasher<ApplicationUser>();
+            var hashedPassword = hasher.HashPassword(null, model.Password);
+            var verified = user.PasswordHash == hashedPassword ? PasswordVerificationResult.Success : PasswordVerificationResult.Failed;
             if(verified == PasswordVerificationResult.Success && user != null)
             {
                 var token = _userService.GenerateJwtToken(user);

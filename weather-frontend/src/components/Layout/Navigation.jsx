@@ -12,7 +12,7 @@ import { MenuLogin } from "../Users/Login";
 import { MenuRegister } from "../Users/Register";
 
 const Navigation = (props) => {
-  const { dispatch } = useContext(AppContext);
+  const { dispatch, store } = useContext(AppContext);
   return (
     <Navbar>
       <Navbar.Brand as={Link} to={"/"}>
@@ -30,7 +30,7 @@ const Navigation = (props) => {
         </Nav.Item>
       </Nav>
       <Nav pullRight>
-        <MenuLogin />
+        {store.user ? <Nav.Item>Uživatel</Nav.Item> : <MenuLogin />}
         <MenuRegister />
         <Nav.Menu title="Theme" trigger="hover">
           <Nav.Item
