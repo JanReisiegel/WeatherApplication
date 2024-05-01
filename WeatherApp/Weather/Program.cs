@@ -48,6 +48,16 @@ builder.Services.AddScoped<LocationServices>();
 builder.Services.AddScoped<LocationTransformation>();
 builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsdef", builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +66,10 @@ app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("corsdef");
 
 app.UseAuthorization();
 app.UseAuthentication();
