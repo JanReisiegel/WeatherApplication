@@ -50,9 +50,9 @@ builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddPolicy("corsdef", builder =>
         {
-            builder.WithOrigins("http://localhost:3000")
+            builder.AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -60,14 +60,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors();
-
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("corsdef");
 
 app.UseAuthorization();
 app.UseAuthentication();

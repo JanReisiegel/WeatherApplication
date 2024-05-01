@@ -8,7 +8,8 @@ import {
   LIGHT_THEME,
 } from "../Auth/AppProvider";
 import { MdContrast, MdDarkMode, MdLightMode } from "react-icons/md";
-import MenuLogin from "../Users/Login";
+import { MenuLogin } from "../Users/Login";
+import { MenuRegister } from "../Users/Register";
 
 const Navigation = (props) => {
   const { dispatch } = useContext(AppContext);
@@ -30,6 +31,7 @@ const Navigation = (props) => {
       </Nav>
       <Nav pullRight>
         <MenuLogin />
+        <MenuRegister />
         <Nav.Menu title="Theme" trigger="hover">
           <Nav.Item
             icon={<MdLightMode />}
