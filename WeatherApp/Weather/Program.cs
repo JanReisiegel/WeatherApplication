@@ -47,6 +47,7 @@ builder.Services.AddScoped<WeatherServices>();
 builder.Services.AddScoped<LocationServices>();
 builder.Services.AddScoped<LocationTransformation>();
 builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
+builder.Services.AddSingleton<UserManager<ApplicationUser>>();
 
 var app = builder.Build();
 

@@ -27,8 +27,19 @@ namespace Weather.Services
 
         public async Task<MyWeatherInfo> GetActualWeather(string cityName)
         {
-            Location location = await _locationTransformation.GetCoordinates(cityName);
-
+            Location location;
+            try
+            {
+                location = await _locationTransformation.GetCoordinates(cityName);
+            }
+            catch (LocationException e)
+            {
+                throw new LocationException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
             var weather = _openWeatherMapService.GetCurrentWeatherAsync(location.Latitude, location.Longitude).Result;
 
             MyWeatherInfo myWeather = new MyWeatherInfo
@@ -51,9 +62,28 @@ namespace Weather.Services
 
         public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName)
         {
-            Location location = await _locationTransformation.GetCoordinates(cityName);
-
-            var weatherForecast =  _openWeatherMapService.GetWeatherForecast5Async(location.Latitude, location.Longitude).Result;
+            Location location;
+            try
+            {
+                location = await _locationTransformation.GetCoordinates(cityName);
+            }
+            catch (LocationException e)
+            {
+                throw new LocationException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            WeatherForecast weatherForecast;
+            try 
+            {
+                weatherForecast = _openWeatherMapService.GetWeatherForecast5Async(location.Latitude, location.Longitude).Result; 
+            } 
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
             MyWeatherForecast myWeatherForecast = new MyWeatherForecast
             {
                 AcquireDateTime = DateTime.Now,

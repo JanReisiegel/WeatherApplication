@@ -20,7 +20,10 @@ namespace Weather.Controllers
         [HttpGet("actual")]
         public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName)
         {
-            var weather = await _weatherServices.GetActualWeather(cityName);
+            MyWeatherInfo weather;
+            try { weather = await _weatherServices.GetActualWeather(cityName); }
+            catch (LocationException e) { return NotFound(e.Message); }
+            catch (Exception e) { return StatusCode(StatusCodes.Status500InternalServerError, e.Message); }
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
@@ -30,7 +33,20 @@ namespace Weather.Controllers
         [HttpGet("forecast")]
         public async Task<ActionResult<MyWeatherForecast>> GetForecast([FromQuery] string cityName)
         {
-            var weather = await _weatherServices.GetWeatherForecast5Days(cityName);
+            MyWeatherForecast weather;
+            try
+            {
+                weather = await _weatherServices.GetWeatherForecast5Days(cityName);
+            }
+            catch (LocationException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+            
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");

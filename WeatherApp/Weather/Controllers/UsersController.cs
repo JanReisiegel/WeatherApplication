@@ -10,15 +10,15 @@ using Weather.ViewModels;
 
 namespace Weather.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly UserServices _userService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UsersController(UserServices userService, UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager)
         {
-            _userService = userService;
+            _userService = new UserServices();
             _userManager = userManager;
 
         }  
