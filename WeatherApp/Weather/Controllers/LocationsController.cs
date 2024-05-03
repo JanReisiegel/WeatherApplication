@@ -10,19 +10,12 @@ namespace Weather.Controllers
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly LocationServices _locationServices;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public LocationsController(UserManager<ApplicationUser> userManager)
-        {
-            _locationServices = new LocationServices();
-            _userManager = userManager;
-        }
+        private readonly LocationServices _locationServices = new LocationServices();
 
         [HttpGet]
-        public IActionResult GetLocation([FromQuery]string cityName)
+        public async Task<IActionResult> GetLocation([FromHeader]string userToken, [FromQuery]string cityName)
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
             if(user == null)
             {
                 return Ok(_locationServices.GetLocation(cityName));
@@ -37,9 +30,9 @@ namespace Weather.Controllers
 
         [Authorize]
         [HttpGet("all")]
-        public IActionResult GetLocations()
+        public async Task<IActionResult> GetLocations([FromHeader] string userToken)
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
             var location = _locationServices.GetAllLocations(user);
             if (location == null)
             {
@@ -49,9 +42,9 @@ namespace Weather.Controllers
         }
         [Authorize]
         [HttpPost]
-        public  IActionResult SaveLocation([FromQuery]string cityName, [FromQuery] string customName)
+        public async Task<IActionResult> SaveLocation([FromHeader]string userToken, [FromQuery]string cityName, [FromQuery] string customName)
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
             Location location = _locationServices.StoreLocation(cityName, customName, user).Result;
             return Ok(location);
         }

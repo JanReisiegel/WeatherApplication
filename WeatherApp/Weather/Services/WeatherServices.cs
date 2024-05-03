@@ -2,6 +2,7 @@
 using OpenWeatherMap;
 using OpenWeatherMap.Models;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services

@@ -4,20 +4,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Weather.Models;
+using Weather.MyExceptions;
 
 namespace Weather.Services
 {
     public class UserServices
     {
-        private readonly JsonFileService<ApplicationUser> _userStore;
-        public UserServices()
-        {
-            _userStore = new JsonFileService<ApplicationUser>("users.json");
-        }
-        public string GenerateJwtToken(ApplicationUser user)
+        public const string _key = "Yxe2g6pX0ftA!#Y1qs@#Z^EyTrT4L1kd";
+        public static string GenerateJwtToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = "Yxe2g6pX0ftA!#Y1qs@#Z^EyTrT4L1kd";
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
@@ -28,39 +24,38 @@ namespace Weather.Services
                     new Claim("username", user.UserName)
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        public ApplicationUser GetUserByEmail(string email)
+
+        public static IDictionary<string, string> GetClaims(string token)
         {
-            var user = _userStore.ReadFromFileAsync().Result.FirstOrDefault(x => x.Email == email);
-            return user;
-        }
-        public Task UpdateUser(ApplicationUser user)
-        {
-            var users = _userStore.ReadFromFileAsync().Result;
-            users.Remove(users.FirstOrDefault(x => x.Id == user.Id));
-            users.Add(user);
-            return _userStore.WriteToFileAsync(users);
-        }
-        public Task DeleteUser(ApplicationUser user)
-        {
-            var users = _userStore.ReadFromFileAsync().Result;
-            users.ForEach(x =>
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParametres = new TokenValidationParameters
             {
-                if (x.Id == user.Id)
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            };
+            try
+            {
+                tokenHandler.ValidateToken(token, validationParametres, out SecurityToken validatedToken);
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var claims = new Dictionary<string, string>();
+                foreach (var claim in jwtToken.Claims)
                 {
-                    users.Remove(x);
+                    claims.Add(claim.Type, claim.Value);
                 }
-            });
-            return _userStore.WriteToFileAsync(users);
-        }
-        public Task<List<ApplicationUser>> GetAllUsers()
-        {
-            var users = _userStore.ReadFromFileAsync().Result;
-            return Task.FromResult(users);
+                return claims;
+            }
+            catch(Exception e)
+            {
+                throw new TokenException(e.Message);
+            }
         }
     }
 }

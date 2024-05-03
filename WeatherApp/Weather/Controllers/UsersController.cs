@@ -12,25 +12,17 @@ namespace Weather.Controllers
 {
     [Route("api/Users")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController: ControllerBase
     {
-        private readonly UserServices _userService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public UsersController(UserManager<ApplicationUser> userManager)
-        {
-            _userService = new UserServices();
-            _userManager = userManager;
-
-        }  
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var user = _userService.GetUserByEmail(model.Email);
+            var user = await JsonFileService.GetUserAsync(model.Email);
             var verified = new PasswordHasher<ApplicationUser>().VerifyHashedPassword(null, user.PasswordHash, model.Password);
             if(verified == PasswordVerificationResult.Success && user != null)
             {
-                var token = _userService.GenerateJwtToken(user);
+                var token = UserServices.GenerateJwtToken(user);
                 return Ok(new { Token = token });
             }
             return Unauthorized();
@@ -48,7 +40,9 @@ namespace Weather.Controllers
                 NormalizedEmail = model.Email.ToUpper(),
                 NormalizedUserName = model.UserName.ToUpper(),
             };
-            var result = await _userManager.CreateAsync(user, model.Password);
+            IdentityResult result = null;
+            try { result = await JsonFileService.AddUserAsync(model); }
+            catch(Exception e) { return BadRequest(e.Message);}
             if(result.Succeeded)
             {
                 return Ok("User was Created");
@@ -58,10 +52,11 @@ namespace Weather.Controllers
 
         //[Authorize]
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser()
+        public async Task<IActionResult> DeleteUser([FromHeader] string userToken, [FromBody]LoginModel loginModel)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            var result = await _userManager.DeleteAsync(user);
+            var claims = UserServices.GetClaims(userToken);
+            var user = await JsonFileService.GetUserAsync(claims["email"]);
+            var result = await JsonFileService.DeleteUserAsync(loginModel);
             if(result.Succeeded)
             {
                 return Ok("User was deleted");
@@ -71,16 +66,11 @@ namespace Weather.Controllers
 
         //[Authorize]
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UserVM model)
+        public async Task<IActionResult> UpdateUser([FromHeader]string userToken, [FromBody] UserVM model)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-
-            user.UserName =String.IsNullOrEmpty(model.UserName) ? user.UserName : model.UserName;
-            user.Email = String.IsNullOrEmpty(model.Email) ? user.UserName : model.Email;
-            user.PhoneNumber = String.IsNullOrEmpty(model.PhoneNumber) ? user.UserName : model.PhoneNumber;
-            user.SavedLocations =  model.Locations;
-            user.PaidAccount = model.PaidAccount;
-            var result = await _userManager.UpdateAsync(user);
+            var claims = UserServices.GetClaims(userToken);
+            var user = await JsonFileService.GetUserAsync(claims["email"]);
+            var result = await JsonFileService.UpdateUserAsync(model);
             if(result.Succeeded)
             {
                 return Ok("User was updated");
@@ -89,9 +79,9 @@ namespace Weather.Controllers
         }
         //[Authorize]
         [HttpGet("one")]
-        public async Task<ActionResult<UserVM>> GetUser()
+        public async Task<ActionResult<UserVM>> GetUserInfo([FromHeader]string userToken)
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
             if(user == null)
             {
                 return NotFound();
@@ -108,9 +98,9 @@ namespace Weather.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<List<UserVM>> GetAllUsers()
+        public async Task<ActionResult<List<UserVM>>> GetAllUsers()
         {
-            List<ApplicationUser> users = _userService.GetAllUsers().Result;
+            List<ApplicationUser> users = await JsonFileService.GetUsersAsync();
             List<UserVM> usersVM = new List<UserVM>();
             users.ForEach(user =>
             {

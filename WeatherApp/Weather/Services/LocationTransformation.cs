@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
