@@ -19,32 +19,8 @@ namespace Test
     [TestClass]
     public class UsersTests: IClassFixture<ApiWebApplicationFactory>
     {
-        private static HttpClient _client;
-        private static Mock<UserManager<ApplicationUser>> _userManagerMock;
         private static UsersController _controller;
         public string Token { get; set; }
-
-        [ClassInitialize]
-        public static void Init(TestContext context)
-        {
-            var userStoreMock = new Mock<IUserStore<ApplicationUser>>();
-            _userManagerMock = new Mock<UserManager<ApplicationUser>>(
-                userStoreMock.Object,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                new LoggerFactory().CreateLogger<UserManager<ApplicationUser>>()
-                );
-
-            _controller = new UsersController(_userManagerMock.Object);
-
-            //var factory = new ApiWebApplicationFactory();
-            //_client = factory.CreateClient();
-        }
 
         [TestMethod]
         public void TestGetAllUsers()

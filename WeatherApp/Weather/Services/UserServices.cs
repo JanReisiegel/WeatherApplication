@@ -57,5 +57,17 @@ namespace Weather.Services
                 throw new TokenException(e.Message);
             }
         }
+        public static async Task<bool> GetAuthorize(Dictionary<string, string> claims)
+        {
+            if (claims == null) { return false; }
+            return claims.ContainsKey("paid_account") ? Boolean.Parse(claims["paid_account"]) : false;
+        }
+
+        public static async Task<bool> GetAuthenticate(string userMail)
+        {
+            var users = await JsonFileService.GetUsersAsync();
+            var user = users.FirstOrDefault(u => u.Email == userMail);
+            return user != null;
+        }
     }
 }
