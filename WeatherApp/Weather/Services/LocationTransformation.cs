@@ -8,23 +8,6 @@ namespace Weather.Services
 {
     public class LocationTransformation
     {
-        public void GetCityName(ref Location location)
-        {
-            var httpClient = new HttpClient();
-            
-            var url = $"https://api.opencagedata.com/geocode/v1/json&q={location.Latitude}%2C{location.Longitude}&key={Constants.OpenGeoCodeApiKey}";
-            var response = httpClient.GetAsync(url).Result;
-
-            if(response.IsSuccessStatusCode)
-            {
-                var content = response.Content.ReadAsStringAsync().Result;
-                var weather = JObject.Parse(content);
-
-                string cityName = weather["address"]["city"].ToString() ?? weather["address"]["town"].ToString() ?? weather["address"]["village"].ToString() ?? weather["address"]["county"].ToString();
-                location.CityName = cityName;
-            }
-        }
-
         public async Task<Location> GetCoordinates(string cityName)
         {
             var httpClient = new HttpClient();

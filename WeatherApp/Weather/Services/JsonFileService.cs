@@ -74,22 +74,6 @@ namespace Weather.Services
             return IdentityResult.Success;
         }
 
-        public static async Task<ApplicationUser> ValidateUserAsync(string email, string password)
-        {
-            var users = await ReadFromFileAsync();
-            var user = users.FirstOrDefault(u => u.Email == email);
-            if (user == null)
-            {
-                return null;
-            }
-            var hasher = new PasswordHasher<ApplicationUser>();
-            if (hasher.VerifyHashedPassword(null, user.PasswordHash, password) == PasswordVerificationResult.Success)
-            {
-                return user;
-            }
-            return null;
-        }
-
         public static async Task<IdentityResult> UpdateUserAsync(UserVM input)
         {
             var users = await ReadFromFileAsync();

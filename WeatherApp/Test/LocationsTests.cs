@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Weather.Controllers;
 using Weather.Models;
+using Weather.Services;
 using Weather.ViewModels;
 
 namespace Test
@@ -22,6 +23,7 @@ namespace Test
             Email = "test@user2.com",
             Password = "Test1234!"
         };
+        private LocationTransformation _locationTransformation = new LocationTransformation();
 
         [OneTimeSetUp]
         public void Setup()
@@ -134,6 +136,14 @@ namespace Test
             var result = await _controller.DeleteLocation(token, "Prazička") as ObjectResult;
             TestContext.WriteLine(token);
             Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
+        }
+
+        [Test]
+        [Order(11)]
+        public async Task TestGetLocatinByCityName()
+        {
+            Location location = await LocationServices.GetLocation("Praha");
+            Assert.That()
         }
 
         [OneTimeTearDown]
