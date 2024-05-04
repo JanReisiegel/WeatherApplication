@@ -18,11 +18,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+/*builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddDefaultTokenProviders()
-    .AddUserStore<JsonUserStore>();
+    .AddUserStore<JsonUserStore>();*/
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+/*builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -40,13 +40,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(Constants.PAY_POLICY, policy => policy.RequireClaim("paid_account", "true"));
-});
+});*/
 
 builder.Services.AddScoped<UserServices>();
 builder.Services.AddScoped<WeatherServices>();
 builder.Services.AddScoped<LocationServices>();
 builder.Services.AddScoped<LocationTransformation>();
-builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
+//builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
+//builder.Services.AddSingleton<UserManager<ApplicationUser>>();
 
 builder.Services.AddCors(options =>
 {

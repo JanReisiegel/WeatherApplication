@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -34,15 +35,29 @@ namespace Weather.Services
             {
                 var json = await response.Content.ReadAsStringAsync();
                 var res = JsonConvert.DeserializeObject<GeocodingClass>(json);
-                double latitude = res.Results.Average(x => x.Geometry.latitude);
-                double longitude = res.Results.Average(x => x.Geometry.longitude);
+                double latitude;
+                double longitude;
+                try
+                {
+                    latitude = res.Results.Average(x => x.Geometry.latitude);
+                    longitude = res.Results.Average(x => x.Geometry.longitude);
+                }
+                catch (InvalidOperationException e)
+                {
+                    throw new LocationException("Město neexistuje");
+                }
+                catch (ArgumentNullException e)
+                {
+                    throw new LocationException("Zadejte název města");
+                }
+                
                 var location = new Location();
                 location.CityName = cityName;
                 location.Latitude = longitude;
                 location.Longitude = latitude;
                 return location;
             }
-            return null;
+            throw new LocationException("Město neexistuje");
         }
     }
 }
