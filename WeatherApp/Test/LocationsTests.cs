@@ -142,8 +142,6 @@ namespace Test
         [Order(11)]
         public async Task TestGetLocatinByCityName()
         {
-            Location location = await LocationServices.GetLocation("Praha");
-            Assert.That()
         }
 
         [OneTimeTearDown]
