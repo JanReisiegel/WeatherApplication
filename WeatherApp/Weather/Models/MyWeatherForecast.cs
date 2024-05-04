@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UnitsNet;
-using Weather.Models;
 
-namespace Weather.ViewModels
+namespace Weather.Models
 {
     public class MyWeatherForecast
     {
@@ -14,7 +13,7 @@ namespace Weather.ViewModels
         public Location? Location { get; set; }
         public DateTime AcquireDateTime { get; set; }
 
-        public List<MyForecastItem>? ForecastItems { get; set; }
+        public ICollection<MyForecastItem>? ForecastItems { get; set; }
     }
 
     public class MyForecastItem
