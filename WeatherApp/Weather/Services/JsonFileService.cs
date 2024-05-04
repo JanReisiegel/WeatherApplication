@@ -31,6 +31,7 @@ namespace Weather.Services
 
         private static async Task WriteToFileAsync(List<ApplicationUser> data)
         {
+            await _lock.WaitAsync();
             try
             {
                 var json = JsonConvert.SerializeObject(data);

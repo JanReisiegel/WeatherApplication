@@ -20,7 +20,7 @@ namespace Weather.Services
                 {
                     new Claim("user_id", user.Id),
                     new Claim("email", user.Email),
-                    new Claim("paid_account", user.PaidAccount.ToString()),
+                    //new Claim("paid_account", user.PaidAccount.ToString()),
                     new Claim("username", user.UserName)
                 }),
                 Expires = DateTime.UtcNow.AddHours(2),

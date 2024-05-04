@@ -50,6 +50,11 @@ namespace Weather.Services
             var existUser = await JsonFileService.GetUserAsync(user.Email);
             return existUser.SavedLocations.FirstOrDefault(x => x.Latitude == latitude && x.Longitude == longitude);
         }
+        public async Task<Location> GetLocation(ApplicationUser user, string customName)
+        {
+            var existUser = await JsonFileService.GetUserAsync(user.Email);
+            return existUser.SavedLocations.FirstOrDefault(x => x.CustomName == customName);
+        }
         public async Task<Location> GetLocation(string cityName, ApplicationUser user)
         {
             var existUser = await JsonFileService.GetUserAsync(user.Email);

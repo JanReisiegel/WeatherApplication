@@ -1,45 +1,49 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NUnit.Framework;
 using Weather.Controllers;
 
 namespace Test
 {
-    [TestClass]
+    [TestFixture]
+    [Order(2)]
     public class WeatherTests
     {
-        private readonly WeatherController _controller;
-        public WeatherTests()
+        private WeatherController _controller;
+
+        [OneTimeSetUp]
+        public void Setup()
         {
             _controller = new WeatherController();
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetActualWeather()
         {
             var response = _controller.GetActualWeather("London").Result.Result as ObjectResult;
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.AreEqual(StatusCodes.Status200OK, response.StatusCode);
+            Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));
         }
-        [TestMethod]
+        [Test]
         public void TestGetActualWeatherNotFound()
         {
             var response = _controller.GetActualWeather("AGUGUDG").Result.Result as ObjectResult;
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.AreEqual(StatusCodes.Status404NotFound, response.StatusCode);
+            Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
         }
-        [TestMethod]
+        [Test]
         public void TestGetForecastNotFound()
         {
             var response = _controller.GetForecast("AGUGUDG").Result.Result as ObjectResult;
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.AreEqual(StatusCodes.Status404NotFound, response.StatusCode);
+            Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
         }
-        [TestMethod]
+        [Test]
         public void TestGetForecastWeather()
         {
             var response = _controller.GetForecast("Praga").Result.Result as ObjectResult; //Nevím proè nefunguje London
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.AreEqual(StatusCodes.Status200OK, response.StatusCode);
+            Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.Services;
 using Weather.ViewModels;
 
@@ -19,13 +20,17 @@ namespace Weather.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var user = await JsonFileService.GetUserAsync(model.Email);
+            if(user == null)
+            {
+                return Unauthorized("User not found");
+            }
             var verified = new PasswordHasher<ApplicationUser>().VerifyHashedPassword(null, user.PasswordHash, model.Password);
             if(verified == PasswordVerificationResult.Success && user != null)
             {
                 var token = UserServices.GenerateJwtToken(user);
                 return Ok(new { Token = token });
             }
-            return Unauthorized();
+            return Unauthorized("Invalid Password");
         }
 
         [HttpPost("register")]
@@ -50,13 +55,28 @@ namespace Weather.Controllers
             return BadRequest(result.Errors);
         }
 
-        //[Authorize]
         [HttpDelete]
-        public async Task<IActionResult> DeleteUser([FromHeader] string userToken, [FromBody]LoginModel loginModel)
+        public async Task<IActionResult> DeleteUser([FromHeader] string? userToken, [FromBody]LoginModel loginModel)
         {
-            var claims = UserServices.GetClaims(userToken);
+            IDictionary<string, string> claims = null;
+            if (userToken == null)
+            {
+                return Unauthorized("You need to be logged in to delete your account");
+            }
+            try { claims = UserServices.GetClaims(userToken); }
+            catch(TokenException e) { return Unauthorized(e.Message); }
+            if (await UserServices.GetAuthenticate(claims["email"]) == false) return Unauthorized("You need to be logged in to delete your account");
+            if (claims["email"] != loginModel.Email) return Unauthorized("You can only delete your own account");
             var user = await JsonFileService.GetUserAsync(claims["email"]);
-            var result = await JsonFileService.DeleteUserAsync(loginModel);
+            IdentityResult result = null;
+            try
+            {
+                result = await JsonFileService.DeleteUserAsync(loginModel);
+            }
+            catch(UserException e)
+            {
+                return Unauthorized(e.Message);
+            }
             if(result.Succeeded)
             {
                 return Ok("User was deleted");
@@ -64,11 +84,18 @@ namespace Weather.Controllers
             return BadRequest(result.Errors);
         }
 
-        //[Authorize]
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromHeader]string userToken, [FromBody] UserVM model)
+        public async Task<IActionResult> UpdateUser([FromHeader]string? userToken, [FromBody] UserVM model)
         {
-            var claims = UserServices.GetClaims(userToken);
+            IDictionary<string, string> claims = null;
+            if (userToken == null)
+            {
+                return Unauthorized("You need to be logged in to delete your account");
+            }
+            try { claims = UserServices.GetClaims(userToken); }
+            catch (TokenException e) { return Unauthorized(e.Message); }
+            if (await UserServices.GetAuthenticate(claims["email"]) == false) return Unauthorized("You need to be logged in to delete your account");
+            if (claims["email"] != model.Email) return Unauthorized("You can only update your own account");
             var user = await JsonFileService.GetUserAsync(claims["email"]);
             var result = await JsonFileService.UpdateUserAsync(model);
             if(result.Succeeded)
@@ -77,10 +104,14 @@ namespace Weather.Controllers
             }
             return BadRequest(result.Errors);
         }
-        //[Authorize]
+
         [HttpGet("one")]
-        public async Task<ActionResult<UserVM>> GetUserInfo([FromHeader]string userToken)
+        public async Task<IActionResult> GetUserInfo([FromHeader]string? userToken)
         {
+            if (userToken == null)
+            {
+                return Unauthorized("You need to be logged in to delete your account");
+            }
             var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
             if(user == null)
             {
@@ -98,8 +129,12 @@ namespace Weather.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<List<UserVM>>> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers([FromHeader]string? userToken)
         {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You need to be logged in to delete your account");
+            }
             List<ApplicationUser> users = await JsonFileService.GetUsersAsync();
             List<UserVM> usersVM = new List<UserVM>();
             users.ForEach(user =>
