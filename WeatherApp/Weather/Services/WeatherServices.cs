@@ -1,23 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OpenWeatherMap;
 using OpenWeatherMap.Models;
-using Weather.Data;
 using Weather.Models;
+using Weather.MyExceptions;
+using Weather.ViewModels;
 
 namespace Weather.Services
 {
     public class WeatherServices
     {
-        private readonly AppDbContext _context;
         private readonly OpenWeatherMapService _openWeatherMapService;
         private readonly LocationTransformation _locationTransformation = new LocationTransformation();
-        private readonly LocationServices _locationServices;
 
-        public WeatherServices(AppDbContext context)
+        public WeatherServices()
         {
-            _context = context;
             _openWeatherMapService = new OpenWeatherMapService(openWeatherMapOptions);
-            _locationServices = new LocationServices(context);
         }
 
         private OpenWeatherMapOptions openWeatherMapOptions = new OpenWeatherMapOptions
@@ -29,16 +26,23 @@ namespace Weather.Services
         };
 
 
-        public async Task<MyWeatherInfo> GetActualWeather(double latitude, double longitude)
+        public async Task<MyWeatherInfo> GetActualWeather(string cityName)
         {
-            Location location = _context.Locations.Where(x => x.Latitude == latitude && x.Longitude == longitude).FirstOrDefault() ?? _locationServices.StoreLocation(latitude, longitude);
-            
-            var resultWeather = _context.MyWeatherInfos.Include(x=>x.Location).Where(x=>x.Location == location && x.AcquireDateTime>=DateTime.Now.AddHours(-1)).FirstOrDefault();
-            if(resultWeather != null)
+            Location location;
+            try
             {
-                return resultWeather;
+                location = await _locationTransformation.GetCoordinates(cityName);
             }
-            var weather = _openWeatherMapService.GetCurrentWeatherAsync(latitude, longitude).Result;
+            catch (LocationException e)
+            {
+                throw new LocationException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            var weather = _openWeatherMapService.GetCurrentWeatherAsync(location.Latitude, location.Longitude).Result;
+
             MyWeatherInfo myWeather = new MyWeatherInfo
             {
                 Temperature = weather.Main.Temperature.DegreesCelsius,
@@ -53,39 +57,56 @@ namespace Weather.Services
                 Condition = (ConditionGroup)weather.Weather[0].Main,
                 AcquireDateTime = DateTime.Now,
                 Location = location,
-                LocationId = location.Id,
             };
-            _context.MyWeatherInfos.Add(myWeather);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch(Exception e)
-            {
-                return null;
-            }
             return myWeather;
         }
 
-        public MyWeatherForecast GetWeatherForecast5Days(double latitude, double longitude)
+        public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName)
         {
-            Location location = _context.Locations.Where(x => x.Latitude == latitude && x.Longitude == longitude).FirstOrDefault() ?? _locationServices.StoreLocation(latitude, longitude);
-            var result = _context.MyWeatherForecasts.Include(x=>x.Location).Where(x=>x.Location == location && x.AcquireDateTime>=DateTime.Now.AddHours(-1)).FirstOrDefault();
-            if(result != null)
+            Location location;
+            try
             {
-                return result;
+                location = await _locationTransformation.GetCoordinates(cityName);
             }
-            var weatherForecast =  _openWeatherMapService.GetWeatherForecast5Async(latitude, longitude).Result;
+            catch (LocationException e)
+            {
+                throw new LocationException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            WeatherForecast weatherForecast;
+            try 
+            {
+                weatherForecast = _openWeatherMapService.GetWeatherForecast5Async(location.Latitude, location.Longitude).Result; 
+            } 
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
             MyWeatherForecast myWeatherForecast = new MyWeatherForecast
             {
                 AcquireDateTime = DateTime.Now,
                 Location = location,
-                LocationId = location.Id,
                 ForecastItems = new List<MyForecastItem>(),
             };
-            throw new NotImplementedException();
+            myWeatherForecast.ForecastItems = new List<MyForecastItem>();
+            weatherForecast.Items.ToList().ForEach(x =>
+            {
+                myWeatherForecast.ForecastItems.Add(new MyForecastItem
+                {
+                    DateTime = x.DateTime,
+                    Temperature = x.Main.Temperature.DegreesCelsius,
+                    FeelsTemperature = x.Main.FeelsLike.DegreesCelsius,
+                    Pressure = x.Main.Pressure.Hectopascals,
+                    Humidity = x.Main.Humidity.Value,
+                    WindSpeed = x.Wind.Speed.MetersPerSecond,
+                    Directory = x.Wind.Direction.Value,
+                    Condition = (ConditionGroup)x.WeatherConditions[0].Main,
+                });
+            });
+            return myWeatherForecast;
         }
-
-        
     }
 }

@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection.Metadata.Ecma335;
-using Weather.Data;
 using Weather.Models;
 using Weather.Services;
 
@@ -12,37 +10,70 @@ namespace Weather.Controllers
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly LocationServices _locationServices;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly LocationServices _locationServices = new LocationServices();
 
-        public LocationsController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        [HttpGet]
+        public async Task<IActionResult> GetSavedLocation([FromHeader]string? userToken, [FromQuery]string cityName)
         {
-            _context = context;
-            _locationServices = new LocationServices(context);
-            _userManager = userManager;
-        }
-
-        [HttpPost]
-        public  IActionResult SaveLocation([FromQuery] double latitude, [FromQuery] double longitude)
-        {
-            Location location = _context.Locations.Where(x => x.Latitude == latitude && x.Longitude == longitude).FirstOrDefault() ?? _locationServices.StoreLocation(latitude, longitude);
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            var location = _locationServices.GetLocation(cityName, user);
             if (location == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
+                return StatusCode(StatusCodes.Status404NotFound, "I can't find this city");
             }
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
-
-            SavedLocation savedLocation = new SavedLocation
+            return Ok(location);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetSavedLocations([FromHeader] string? userToken)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
             {
-                Location = location,
-                LocationId = location.Id,
-                User = user,
-                UserId = user.Id,
-            };
-            _context.SavedLocations.Add(savedLocation);
-            _context.SaveChanges();
-            return Ok(savedLocation);
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            var locations = await _locationServices.GetAllLocations(user);
+            if (locations == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot load data from database, please contact admin");
+            }
+            return Ok(locations);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SaveLocation([FromHeader]string? userToken, [FromQuery]string cityName, [FromQuery] string customName)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            Location location = _locationServices.StoreLocation(cityName, customName, user).Result;
+            return Ok(location);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLocation([FromHeader]string? userToken, [FromQuery]string customName)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            var location = await _locationServices.GetLocation(user, customName);
+            if (location == null)
+            {
+                return NotFound("Location not found");
+            }
+            user.SavedLocations.Remove(location);
+            var result = await JsonFileService.UpdateUserAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("Location deleted");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
         }
     }
 }
