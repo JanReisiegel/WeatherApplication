@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Weather.Models;
-using Weather.MyExceptions;
+using Weather.Data;
 using Weather.Services;
-using Weather.ViewModels;
 
 namespace Weather.Controllers
 {
@@ -11,15 +9,19 @@ namespace Weather.Controllers
     [ApiController]
     public class WeatherController : ControllerBase
     {
-        private readonly WeatherServices _weatherServices = new WeatherServices();
+        private readonly AppDbContext _context;
+        private readonly WeatherServices _weatherServices;
 
-        [HttpGet("actual")]
-        public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName)
+        public WeatherController(AppDbContext context)
         {
-            MyWeatherInfo weather;
-            try { weather = await _weatherServices.GetActualWeather(cityName); }
-            catch (LocationException e) { return NotFound(e.Message); }
-            catch (Exception e) { return StatusCode(StatusCodes.Status500InternalServerError, e.Message); }
+            _context = context;
+            _weatherServices = new WeatherServices(context);
+        }
+
+        [HttpGet]
+        public IActionResult Get([FromQuery] double latitude, [FromQuery] double longitude)
+        {
+            var weather = _weatherServices.GetActualWeather(latitude, longitude);
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
@@ -27,22 +29,9 @@ namespace Weather.Controllers
             return Ok(weather);
         }
         [HttpGet("forecast")]
-        public async Task<ActionResult<MyWeatherForecast>> GetForecast([FromQuery] string cityName)
+        public IActionResult GetForecast([FromQuery] double latitude, [FromQuery] double longitude)
         {
-            MyWeatherForecast weather;
-            try
-            {
-                weather = await _weatherServices.GetWeatherForecast5Days(cityName);
-            }
-            catch (LocationException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
-            }
-            
+            var weather = _weatherServices.GetWeatherForecast5Days(latitude, longitude);
             if (weather == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
