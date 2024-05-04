@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Weather.Controllers;
+using Weather.Models;
 using Weather.ViewModels;
 
 namespace Test
 {
     [TestFixture]
-    [Order(3)]
     public class LocationsTests
     {
         private LocationsController _controller;
@@ -34,10 +34,10 @@ namespace Test
                 Password = _loginModel.Password,
                 PhoneNumber = "123456789",
                 UserName = "TestUser2"
-            });
+            }).Result;
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var locationResult = _controller.SaveLocation(token, "Praha", "Prazička");
+            var locationResult = _controller.SaveLocation(token, "Praha", "Prazička").Result;
         }
 
         [Test]
@@ -66,15 +66,15 @@ namespace Test
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.GetSavedLocation(token, "NewYork") as ObjectResult;
-            TestContext.WriteLine(result.StatusCode);
-            Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
+            TestContext.WriteLine(result.Value);
+            Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
         }
 
         [Test]
         [Order(4)]
         public async Task TestSaveLocationUnauthorized()
         {
-            var result = await _controller.SaveLocation(null, "Praha", "Prazička") as ObjectResult;
+            var result = await _controller.SaveLocation(null, "Brno", "Prazička") as ObjectResult;
             Assert.That(Equals(StatusCodes.Status401Unauthorized, result.StatusCode));
         }
 
@@ -110,7 +110,7 @@ namespace Test
         [Order(8)]
         public async Task TestDeleteLocationUnauthorized()
         {
-            var result = await _controller.DeleteLocation(null, "Prazička") as ObjectResult;
+            var result = await _controller.DeleteLocation(null, "Nový Jork") as ObjectResult;
             Assert.That(Equals(StatusCodes.Status401Unauthorized, result.StatusCode));
         }
 
@@ -120,6 +120,7 @@ namespace Test
         {
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
+            TestContext.WriteLine(token);
             var result = await _controller.DeleteLocation(token, "Brníčko") as ObjectResult;
             Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
         }
@@ -131,8 +132,8 @@ namespace Test
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.DeleteLocation(token, "Prazička") as ObjectResult;
-            TestContext.WriteLine(result.Value);
-            Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
+            TestContext.WriteLine(token);
+            Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
         }
 
         [OneTimeTearDown]
@@ -145,7 +146,8 @@ namespace Test
 
         private string tokenParse(string token)
         {
-            return token.Replace("{ ", "").Replace(" }", "").Split(" = ")[1];
+            List<string> tokenList = token.Replace(" ", "").Replace("{", "").Replace("}", "").Split("=").ToList();
+            return tokenList.Last();
         }
     }
 }

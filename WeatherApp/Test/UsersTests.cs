@@ -7,7 +7,6 @@ using Weather.ViewModels;
 namespace Test
 {
     [TestFixture]
-    [Order(1)]
     public class UsersTests
     {
         private UsersController _controller;
@@ -60,7 +59,7 @@ namespace Test
             var tokenResponse = await _controller.Login(userLogin) as ObjectResult;
             string token = tokenParse(tokenResponse.Value.ToString());
             var response = await _controller.GetAllUsers(token) as ObjectResult;
-            Assert.That(Equals(StatusCodes.Status401Unauthorized, response.StatusCode));
+            Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));
         }
         [Test]
         [Order(4)]

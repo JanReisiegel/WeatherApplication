@@ -6,7 +6,6 @@ using Weather.Controllers;
 namespace Test
 {
     [TestFixture]
-    [Order(2)]
     public class WeatherTests
     {
         private WeatherController _controller;

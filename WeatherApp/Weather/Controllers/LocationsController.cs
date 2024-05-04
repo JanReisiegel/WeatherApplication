@@ -35,12 +35,12 @@ namespace Weather.Controllers
                 return Unauthorized("You must be logged in");
             }
             var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
-            var location = _locationServices.GetAllLocations(user);
-            if (location == null)
+            var locations = await _locationServices.GetAllLocations(user);
+            if (locations == null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Cannot load data from database, please contact admin");
             }
-            return Ok(location);
+            return Ok(locations);
         }
         [HttpPost]
         public async Task<IActionResult> SaveLocation([FromHeader]string? userToken, [FromQuery]string cityName, [FromQuery] string customName)
