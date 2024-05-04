@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
@@ -12,6 +13,7 @@ using Weather.ViewModels;
 namespace Weather.Controllers
 {
     [Route("api/Users")]
+    [EnableCors]
     [ApiController]
     public class UsersController: ControllerBase
     {
