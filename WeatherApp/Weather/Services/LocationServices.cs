@@ -13,6 +13,7 @@ namespace Weather.Services
         {
             var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new UserException("User not found");
             Location location = await _locationTransformation.GetCoordinates(cityName);
+            location.CustomName = customName;
             user.SavedLocations.Add(location);
             var result = await JsonFileService.UpdateUserAsync(user);
             if (result.Succeeded) { return location; }
@@ -26,7 +27,8 @@ namespace Weather.Services
         public async Task<Location> GetLocation(string cityName, ApplicationUser user)
         {
             var existUser = await JsonFileService.GetUserAsync(user.Email);
-            return existUser.SavedLocations.FirstOrDefault(x =>x.CityName == cityName) ?? null;
+            Location result = existUser.SavedLocations.FirstOrDefault(x => x.CityName == cityName) ?? throw new LocationException("Location not found");
+            return result;
         }
         public async Task<Location> GetLocation(string cityName)
         {

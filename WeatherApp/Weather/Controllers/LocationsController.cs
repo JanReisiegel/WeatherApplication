@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.Services;
 
 namespace Weather.Controllers
@@ -20,10 +21,14 @@ namespace Weather.Controllers
                 return Unauthorized("You must be logged in");
             }
             var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
-            var location = _locationServices.GetLocation(cityName, user);
-            if (location == null)
+            Location location; 
+            try
             {
-                return StatusCode(StatusCodes.Status404NotFound, "I can't find this city");
+                location = await _locationServices.GetLocation(cityName, user);
+            } 
+            catch (LocationException e)
+            {
+                return NotFound(e.Message);
             }
             return Ok(location);
         }

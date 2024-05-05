@@ -68,8 +68,7 @@ namespace Test
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.GetSavedLocation(token, "NewYork") as ObjectResult;
-            TestContext.WriteLine(result.Value);
-            Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
+            Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
         }
 
         [Test]
@@ -135,13 +134,15 @@ namespace Test
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.DeleteLocation(token, "Prazička") as ObjectResult;
             TestContext.WriteLine(token);
-            Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
+            Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
         }
 
         [Test]
         [Order(11)]
         public async Task TestGetLocatinByCityName()
         {
+            //var result = _locationTransformation.;
+            //Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
         }
 
         [OneTimeTearDown]
