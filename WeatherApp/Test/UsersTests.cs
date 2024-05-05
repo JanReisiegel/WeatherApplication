@@ -232,6 +232,15 @@ namespace Test
             Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));           
         }
 
+        [Test]
+        [Order(15)]
+        public async Task TestUserinvalidToken()
+        {
+            string invalidToken = "asjhgfsdgfhdsgh654vdbvhsvgbvavsbvsfv.ahvfcvauvieveve4vvb5fv4vvaasugRD5HGFCf4DFVSSDyxdhfngmdmgmmjhmmdfgvuhsdgvvvvjsdfbjvjhbasvkfjsbvdkjfdjbvhdjfbvhbazvazvFkndcsalkcnbgckjJkjkbkbcdůkbbc5vb3b3fgjhvjbvbgfnbfgjjyshdvIUHUZ5448sdc34vd323gCbjsd.uzgOhgvdfc4asfd9iugS654fdW321sv-Hbdsjuhvb47";
+            var response = await _controller.DeleteUser(invalidToken, new LoginModel { Email = User.Email, Password = User.Password }) as ObjectResult;
+            Assert.That(Equals(StatusCodes.Status406NotAcceptable, response.StatusCode));
+        }
+
         private string tokenParse(string token)
         {
             return token.Replace("{ ", "").Replace(" }", "").Split(" = ")[1];

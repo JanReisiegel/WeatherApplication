@@ -66,7 +66,7 @@ namespace Weather.Controllers
                 return Unauthorized("You need to be logged in to delete your account");
             }
             try { claims = UserServices.GetClaims(userToken); }
-            catch(TokenException e) { return Unauthorized(e.Message); }
+            catch(TokenException e) { return StatusCode(StatusCodes.Status406NotAcceptable,e.Message); }
             if (await UserServices.GetAuthenticate(claims["email"]) == false) return Unauthorized("You need to be logged in to delete your account");
             if (claims["email"] != loginModel.Email) return Unauthorized("You can only delete your own account");
             var user = await JsonFileService.GetUserAsync(claims["email"]);
