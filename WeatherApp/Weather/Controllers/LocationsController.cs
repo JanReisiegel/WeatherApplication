@@ -2,58 +2,83 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
+using Weather.MyExceptions;
 using Weather.Services;
 
 namespace Weather.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Locations")]
     [ApiController]
     public class LocationsController : ControllerBase
     {
-        private readonly LocationServices _locationServices;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public LocationsController(UserManager<ApplicationUser> userManager)
-        {
-            _locationServices = new LocationServices();
-            _userManager = userManager;
-        }
+        private readonly LocationServices _locationServices = new LocationServices();
 
         [HttpGet]
-        public IActionResult GetLocation([FromQuery]string cityName)
+        public async Task<IActionResult> GetSavedLocation([FromHeader]string? userToken, [FromQuery]string cityName)
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
-            if(user == null)
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
             {
-                return Ok(_locationServices.GetLocation(cityName));
+                return Unauthorized("You must be logged in");
             }
-            var location = _locationServices.GetLocation(cityName, user);
-            if (location == null)
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            Location location; 
+            try
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
+                location = await _locationServices.GetLocation(cityName, user);
+            } 
+            catch (LocationException e)
+            {
+                return NotFound(e.Message);
             }
+            return Ok(location);
+        }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetSavedLocations([FromHeader] string? userToken)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            var locations = await _locationServices.GetAllLocations(user);
+            if (locations == null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot load data from database, please contact admin");
+            }
+            return Ok(locations);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SaveLocation([FromHeader]string? userToken, [FromQuery]string cityName, [FromQuery] string customName)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            Location location = _locationServices.StoreLocation(cityName, customName, user).Result;
             return Ok(location);
         }
 
-        [Authorize]
-        [HttpGet("all")]
-        public IActionResult GetLocations()
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLocation([FromHeader]string? userToken, [FromQuery]string customName)
         {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
-            var location = _locationServices.GetAllLocations(user);
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
+            var location = await _locationServices.GetLocation(user, customName);
             if (location == null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
+                return NotFound("Location not found");
             }
-            return Ok(location);
-        }
-        [Authorize]
-        [HttpPost]
-        public  IActionResult SaveLocation([FromQuery]string cityName, [FromQuery] string customName)
-        {
-            var user = _userManager.GetUserAsync(HttpContext.User).Result;
-            Location location = _locationServices.StoreLocation(cityName, customName, user).Result;
-            return Ok(location);
+            user.SavedLocations.Remove(location);
+            var result = await JsonFileService.UpdateUserAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok("Location deleted");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
         }
     }
 }

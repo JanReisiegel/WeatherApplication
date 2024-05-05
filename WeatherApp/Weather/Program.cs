@@ -17,36 +17,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddDefaultTokenProviders()
-    .AddUserStore<JsonUserStore>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(Constants.PAY_POLICY, policy => policy.RequireClaim("paid_account", "true"));
-});
-
 builder.Services.AddScoped<UserServices>();
 builder.Services.AddScoped<WeatherServices>();
 builder.Services.AddScoped<LocationServices>();
 builder.Services.AddScoped<LocationTransformation>();
-builder.Services.AddScoped<IUserStore<ApplicationUser>, JsonUserStore>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsdef", builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 builder.Services.AddCors(options =>
 {

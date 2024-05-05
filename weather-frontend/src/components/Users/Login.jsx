@@ -1,14 +1,15 @@
 import axios from "axios";
 import React, { useState, useContext } from "react";
-import { Button, Form, Modal, Nav } from "rsuite";
+import { Button, Form, Modal, Nav, Message } from "rsuite";
 import { UserApi } from "../../configuration/API";
 import { AppContext } from "../Auth/AppProvider";
 
 export const MenuLogin = () => {
-  const { dispatch } = useContext(AppContext);
+  const { store, dispatch } = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
+  const [response, setResponse] = useState(Number);
 
   const signInAction = () => {
     axios
@@ -26,17 +27,43 @@ export const MenuLogin = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
-        dispatch({
-          type: "USER_FOUND",
-          payload: {
-            user: response.data.user,
-            token: response.data.token,
-          },
-        });
+        console.log(response);
+        let token = response.data.token;
+        if (response.status === 200) {
+          setEmail("");
+          setPassword("");
+          getUserInfo(token);
+          setResponse(200);
+        }
       })
       .catch((error) => {
         //console.error(error);
+      });
+  };
+
+  const getUserInfo = (token) => {
+    axios
+      .get(UserApi.getOne, {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "http://localhost:3000",
+          userToken: token,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        if (response.status === 200) {
+          dispatch({
+            type: "USER_FOUND",
+            payload: {
+              user: response.data,
+              token: token,
+            },
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
       });
   };
 
@@ -61,6 +88,11 @@ export const MenuLogin = () => {
           <Modal.Title>Přihlášení</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {response === 200 ? (
+            <Message showIcon type="success">
+              Přihlášení bylo úspěšné
+            </Message>
+          ) : null}
           <Form>
             <Form.Group controlId="email">
               <Form.ControlLabel>Email</Form.ControlLabel>
@@ -92,6 +124,9 @@ export const MenuLogin = () => {
           </Button>
           <Button onClick={() => signInAction()} appearance="primary">
             Přihlásit se
+          </Button>
+          <Button onClick={() => console.log(store)} appearance="primary">
+            testUser
           </Button>
         </Modal.Footer>
       </Modal>
