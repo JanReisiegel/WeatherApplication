@@ -19,7 +19,7 @@ const initialState = {
   endLogTime: null,
   loggedIn: false,
   isUserLoaging: false,
-  theme: "light",
+  theme: "dark",
 };
 
 const parseJwt = (token) => {
