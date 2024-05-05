@@ -23,7 +23,7 @@ namespace Weather.Services
                     //new Claim("paid_account", user.PaidAccount.ToString()),
                     new Claim("username", user.UserName)
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.Now.AddYears(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
