@@ -1,17 +1,16 @@
-import React, { useContext, useState } from "react";
-import { AppContext } from "../Auth/AppProvider";
-import { Button, Form, Modal, Nav } from "rsuite";
+import React, { useState } from "react";
+import { Button, Form, Message, Modal, Nav } from "rsuite";
 import FormGroup from "rsuite/esm/FormGroup";
 import axios from "axios";
 import { UserApi } from "../../configuration/API";
 
 export const MenuRegister = () => {
-  const { dispatch } = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
   const [username, setUsername] = useState("");
   const [visible, setVisible] = useState(false);
+  const [response, setResponse] = useState(Number);
 
   const registerAction = () => {
     console.log(email, password, phoneNo, username);
@@ -21,8 +20,8 @@ export const MenuRegister = () => {
         {
           email: email,
           password: password,
-          phoneNo: phoneNo,
-          username: username,
+          phoneNumber: phoneNo,
+          userName: username,
         },
         {
           headers: {
@@ -33,6 +32,13 @@ export const MenuRegister = () => {
       )
       .then((response) => {
         console.log(response);
+        if (response.status === 200) {
+          setResponse(200);
+          setEmail("");
+          setPassword("");
+          setPhoneNo("");
+          setUsername("");
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -51,6 +57,11 @@ export const MenuRegister = () => {
         keyboard={true}
       >
         <Modal.Header>
+          {response === 200 ? (
+            <Message showIcon type="success">
+              {response}
+            </Message>
+          ) : null}
           <Modal.Title>Registrace</Modal.Title>
         </Modal.Header>
         <Modal.Body>

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Navbar, Nav } from "rsuite";
 import { Link, NavLink } from "react-router-dom";
 import {
@@ -12,7 +12,8 @@ import { MenuLogin } from "../Users/Login";
 import { MenuRegister } from "../Users/Register";
 
 const Navigation = (props) => {
-  const { dispatch } = useContext(AppContext);
+  const { store, dispatch } = useContext(AppContext);
+  useEffect(() => {}, [store]);
   return (
     <Navbar>
       <Navbar.Brand as={Link} to={"/"}>
@@ -22,7 +23,11 @@ const Navigation = (props) => {
         <Nav.Item eventKey={1} as={Link} to={"/"}>
           Home
         </Nav.Item>
-        <Nav.Item eventKey={2} as={NavLink} to={"/weather"}>
+        <Nav.Item
+          eventKey={2}
+          as={NavLink}
+          to={"/actual-weather?cityName=Liberec"}
+        >
           Aktuální počasí
         </Nav.Item>
         <Nav.Item eventKey={2} as={NavLink} to={"/forecats"}>
@@ -30,8 +35,24 @@ const Navigation = (props) => {
         </Nav.Item>
       </Nav>
       <Nav pullRight>
-        <MenuLogin />
-        <MenuRegister />
+        {store.loggedIn ? (
+          <>
+            <Nav.Item eventKey={3} as={Link} to={"/profile"}>
+              {store.user.userName}
+            </Nav.Item>
+            <Nav.Item
+              eventKey={4}
+              onClick={() => dispatch({ type: "USER_SIGNOUT" })}
+            >
+              Logout
+            </Nav.Item>
+          </>
+        ) : (
+          <>
+            <MenuLogin />
+            <MenuRegister />
+          </>
+        )}
         <Nav.Menu title="Theme" trigger="hover">
           <Nav.Item
             icon={<MdLightMode />}

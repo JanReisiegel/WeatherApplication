@@ -7,7 +7,7 @@ using Weather.Services;
 
 namespace Weather.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Locations")]
     [ApiController]
     public class LocationsController : ControllerBase
     {

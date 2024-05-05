@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navigation from "./components/Layout/Navigation";
 import Unauthorized from "./components/General/Unauthorized";
 import { Col, Row } from "rsuite";
+import ActualWeather from "./components/Weather/ActualWeather";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
             <Navigation />
             <Routes>
               <Route path="/" element={<Unauthorized />} />
+              <Route path="/actual-weather" element={<ActualWeather />} />
+              <Route path="/forecats" element={<Unauthorized />} />
             </Routes>
           </Col>
           <Col sx={24} sm={24} md={3} lg={2}></Col>

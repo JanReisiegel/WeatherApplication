@@ -7,7 +7,7 @@ using Weather.ViewModels;
 
 namespace Weather.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Weather")]
     [ApiController]
     public class WeatherController : ControllerBase
     {

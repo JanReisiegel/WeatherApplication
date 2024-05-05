@@ -1,5 +1,4 @@
 import React, { createContext, useReducer, useEffect } from "react";
-import axios from "axios";
 import { CustomProvider } from "rsuite";
 
 const LOCAL_STORAGE_KEY = "weather-app";
