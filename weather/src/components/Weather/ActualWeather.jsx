@@ -20,8 +20,6 @@ import {
   Text,
 } from "rsuite";
 import { MdOutlineSearch } from "react-icons/md";
-import Chart from "react-apexcharts";
-import GaugeComponent from "react-gauge-component";
 
 const ActualWeather = () => {
   const { store } = useContext(AppContext);
