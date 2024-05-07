@@ -1,28 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using UnitsNet;
+using Weather.Models;
 
-namespace Weather.Models
+namespace Weather.ViewModels
 {
     public class MyWeatherForecast
     {
-        [Key]
-        public int Id { get; set; }
-        public int LocationId { get; set; }
-        [ForeignKey("LocationId")]
         public Location? Location { get; set; }
         public DateTime AcquireDateTime { get; set; }
 
-        public ICollection<MyForecastItem>? ForecastItems { get; set; }
+        public List<MyForecastItem>? ForecastItems { get; set; }
     }
 
     public class MyForecastItem
     {
-        [Key]
-        public int Id { get; set; }
-        public int ForecastId { get; set; }
-        [ForeignKey("ForecastId")]
-        public MyWeatherForecast? Forecast { get; set; }
         public DateTime? DateTime { get; set; }
         //srážky
         public double? Rain1h { get; set; }

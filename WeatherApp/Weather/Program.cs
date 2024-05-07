@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Weather.Data;
 using Weather.Models;
 using Weather.Services;
 
@@ -17,34 +17,30 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=weather.db"));
-
-builder.Services.AddIdentity<ApplicationUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(Constants.PAY_POLICY, policy => policy.RequireClaim("paid_account", "true"));
-});
-
 builder.Services.AddScoped<UserServices>();
 builder.Services.AddScoped<WeatherServices>();
+builder.Services.AddScoped<LocationServices>();
+builder.Services.AddScoped<LocationTransformation>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsdef", builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("corsdef", builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -54,6 +50,10 @@ app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseCors("corsdef");
 
 app.UseAuthorization();
 app.UseAuthentication();
