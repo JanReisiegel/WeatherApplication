@@ -125,9 +125,6 @@ export const MenuLogin = () => {
           <Button onClick={() => signInAction()} appearance="primary">
             Přihlásit se
           </Button>
-          <Button onClick={() => console.log(store)} appearance="primary">
-            testUser
-          </Button>
         </Modal.Footer>
       </Modal>
     </>

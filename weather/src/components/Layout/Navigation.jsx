@@ -37,9 +37,11 @@ const Navigation = (props) => {
       <Nav pullRight>
         {store.loggedIn ? (
           <>
-            <Nav.Item eventKey={3} as={Link} to={"/profile"}>
-              {store.user.userName}
-            </Nav.Item>
+            <Nav.Menu title={store.user.userName} trigger="click">
+              <Nav.Item eventKey={3} as={Link} to={"/saved-locations"}>
+                Uložená místa
+              </Nav.Item>
+            </Nav.Menu>
             <Nav.Item
               eventKey={4}
               onClick={() => dispatch({ type: "USER_SIGNOUT" })}

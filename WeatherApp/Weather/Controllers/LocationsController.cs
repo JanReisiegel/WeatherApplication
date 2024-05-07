@@ -14,7 +14,7 @@ namespace Weather.Controllers
         private readonly LocationServices _locationServices = new LocationServices();
 
         [HttpGet]
-        public async Task<IActionResult> GetSavedLocation([FromHeader]string? userToken, [FromQuery]string cityName)
+        public async Task<IActionResult> GetSavedLocation([FromHeader]string? userToken, [FromQuery]string customName)
         {
             if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
             {
@@ -24,7 +24,7 @@ namespace Weather.Controllers
             Location location; 
             try
             {
-                location = await _locationServices.GetLocation(cityName, user);
+                location = await _locationServices.GetLocation(user, customName);
             } 
             catch (LocationException e)
             {
@@ -72,7 +72,8 @@ namespace Weather.Controllers
             {
                 return NotFound("Location not found");
             }
-            user.SavedLocations.Remove(location);
+            var index = user.SavedLocations.FindIndex(l => l.CustomName == customName);
+            user.SavedLocations.RemoveAt(index);
             var result = await JsonFileService.UpdateUserAsync(user);
             if (result.Succeeded)
             {
