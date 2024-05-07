@@ -30,7 +30,7 @@ namespace Weather.Controllers
             {
                 return NotFound(e.Message);
             }
-            return Ok(location);
+            return location == null ? StatusCode(StatusCodes.Status204NoContent, "Cannot load data from database, please contact admin") : Ok(location);
         }
         [HttpGet("all")]
         public async Task<IActionResult> GetSavedLocations([FromHeader] string? userToken)

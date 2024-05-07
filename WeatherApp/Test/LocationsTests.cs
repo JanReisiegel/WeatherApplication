@@ -50,7 +50,7 @@ namespace Test
             TestContext.WriteLine(login.Value);
             var token = tokenParse(login.Value.ToString());
             TestContext.WriteLine(token);
-            var result = await _controller.GetSavedLocation(token, "Praha") as ObjectResult;
+            var result = await _controller.GetSavedLocation(token, "Prazička") as ObjectResult;
             TestContext.WriteLine(result.Value);
             Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
         }
@@ -69,7 +69,7 @@ namespace Test
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.GetSavedLocation(token, "NewYork") as ObjectResult;
             TestContext.WriteLine(result.StatusCode);
-            Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
+            Assert.That(Equals(StatusCodes.Status204NoContent, result.StatusCode));
         }
 
         [Test]
