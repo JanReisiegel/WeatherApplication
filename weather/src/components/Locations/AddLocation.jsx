@@ -1,6 +1,6 @@
 import axios from "axios";
 import { LocationApi } from "../../configuration/API";
-import { redirect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button, Form } from "rsuite";
 import { useContext, useState } from "react";
 import { AppContext } from "../Auth/AppProvider";
@@ -9,6 +9,7 @@ export const AddLocation = () => {
   const { store } = useContext(AppContext);
   const [customName, setCustomName] = useState("");
   const [cityName, setCityName] = useState("");
+  const navigate = useNavigate();
 
   const saveLocation = () => {
     axios
@@ -37,7 +38,7 @@ export const AddLocation = () => {
         console.error(error);
       })
       .finally(() => {
-        return redirect("/saved-locations");
+        return navigate("/saved-locations");
       });
   };
 
