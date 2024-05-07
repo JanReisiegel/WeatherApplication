@@ -68,6 +68,7 @@ namespace Test
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
             var result = await _controller.GetSavedLocation(token, "NewYork") as ObjectResult;
+            TestContext.WriteLine(result.StatusCode);
             Assert.That(Equals(StatusCodes.Status404NotFound, result.StatusCode));
         }
 

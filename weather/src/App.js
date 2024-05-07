@@ -8,6 +8,7 @@ import { Col, Row } from "rsuite";
 import ActualWeather from "./components/Weather/ActualWeather";
 import { SavedLocations } from "./components/Locations/SavedLocations";
 import { AddLocation } from "./components/Locations/AddLocation";
+import { ForecastWeather } from "./components/Weather/ForecastWeather";
 
 function App() {
   return (
@@ -18,9 +19,9 @@ function App() {
           <Col sx={24} sm={24} md={18} lg={20}>
             <Navigation />
             <Routes>
-              <Route path="/" element={<Unauthorized />} />
+              <Route path="/" element={<ActualWeather />} />
               <Route path="/actual-weather" element={<ActualWeather />} />
-              <Route path="/forecats" element={<Unauthorized />} />
+              <Route path="/forecats" element={<ForecastWeather />} />
               <Route path="/saved-locations" element={<SavedLocations />} />
               <Route path="/add-location" element={<AddLocation />} />
             </Routes>
