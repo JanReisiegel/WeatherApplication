@@ -14,10 +14,10 @@ namespace Weather.Controllers
         private readonly WeatherServices _weatherServices = new WeatherServices();
 
         [HttpGet("actual")]
-        public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName)
+        public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName, [FromQuery]string country)
         {
             MyWeatherInfo weather;
-            try { weather = await _weatherServices.GetActualWeather(cityName); }
+            try { weather = await _weatherServices.GetActualWeather(cityName, country); }
             catch (LocationException e) { return NotFound(e.Message); }
             catch (Exception e) { return StatusCode(StatusCodes.Status500InternalServerError, e.Message); }
             if (weather == null)
@@ -27,12 +27,12 @@ namespace Weather.Controllers
             return Ok(weather);
         }
         [HttpGet("forecast")]
-        public async Task<ActionResult<MyWeatherForecast>> GetForecast([FromQuery] string cityName)
+        public async Task<ActionResult<MyWeatherForecast>> GetForecast([FromQuery] string cityName, [FromQuery] string country)
         {
             MyWeatherForecast weather;
             try
             {
-                weather = await _weatherServices.GetWeatherForecast5Days(cityName);
+                weather = await _weatherServices.GetWeatherForecast5Days(cityName, country);
             }
             catch (LocationException e)
             {
@@ -49,5 +49,6 @@ namespace Weather.Controllers
             }
             return Ok(weather);
         }
+
     }
 }

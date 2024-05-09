@@ -26,12 +26,12 @@ namespace Weather.Services
         };
 
 
-        public async Task<MyWeatherInfo> GetActualWeather(string cityName)
+        public async Task<MyWeatherInfo> GetActualWeather(string cityName, string country)
         {
             Location location;
             try
             {
-                location = await _locationTransformation.GetCoordinates(cityName);
+                location = await _locationTransformation.GetCoordinates(cityName, country);
             }
             catch (LocationException e)
             {
@@ -61,12 +61,12 @@ namespace Weather.Services
             return myWeather;
         }
 
-        public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName)
+        public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName, string country)
         {
             Location location;
             try
             {
-                location = await _locationTransformation.GetCoordinates(cityName);
+                location = await _locationTransformation.GetCoordinates(cityName, country);
             }
             catch (LocationException e)
             {
@@ -107,6 +107,17 @@ namespace Weather.Services
                 });
             });
             return myWeatherForecast;
+        }
+
+        public async Task<MyWeatherForecast> GetWeatherHistory(Location location)
+        {
+            var client = new HttpClient();
+            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude},{location.Longitude}";
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                
+            }
         }
     }
 }

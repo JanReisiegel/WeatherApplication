@@ -48,14 +48,14 @@ namespace Weather.Controllers
             return Ok(locations);
         }
         [HttpPost]
-        public async Task<IActionResult> SaveLocation([FromHeader]string? userToken, [FromQuery]string cityName, [FromQuery] string customName)
+        public async Task<IActionResult> SaveLocation([FromHeader]string? userToken, [FromQuery]string cityName, [FromQuery]string country, [FromQuery] string customName)
         {
             if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
             {
                 return Unauthorized("You must be logged in");
             }
             var user = await JsonFileService.GetUserAsync(UserServices.GetClaims(userToken)["email"]);
-            Location location = _locationServices.StoreLocation(cityName, customName, user).Result;
+            Location location = _locationServices.StoreLocation(cityName, country, customName, user).Result;
             return Ok(location);
         }
 

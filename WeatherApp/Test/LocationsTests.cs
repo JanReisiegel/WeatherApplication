@@ -39,7 +39,7 @@ namespace Test
             }).Result;
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var locationResult = _controller.SaveLocation(token, "Praha", "Prazička").Result;
+            var locationResult = _controller.SaveLocation(token, "Praha", "Czech Republic","Prazička").Result;
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace Test
         [Order(4)]
         public async Task TestSaveLocationUnauthorized()
         {
-            var result = await _controller.SaveLocation(null, "Brno", "Prazička") as ObjectResult;
+            var result = await _controller.SaveLocation(null, "Brno","Czech Republic", "Prazička") as ObjectResult;
             Assert.That(Equals(StatusCodes.Status401Unauthorized, result.StatusCode));
         }
 
@@ -86,7 +86,7 @@ namespace Test
         {
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var result = await _controller.SaveLocation(token, "London", "Londýnek") as ObjectResult;
+            var result = await _controller.SaveLocation(token, "London","United Kingdom", "Londýnek") as ObjectResult;
             Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
         }
 
@@ -140,10 +140,87 @@ namespace Test
 
         [Test]
         [Order(11)]
-        public async Task TestGetLocatinByCityName()
+        public async Task TestGetCodeBritain()
         {
-            //var result = _locationTransformation.;
-            //Assert.That(Equals(StatusCodes.Status200OK, result.StatusCode));
+            var result = _locationTransformation.GetCountryCode("United Kingdom");
+            Assert.That(Equals(result, "gb"));
+        }
+        [Test]
+        [Order(12)]
+        public async Task TestGetCodeChina()
+        {
+            var result = _locationTransformation.GetCountryCode("China");
+            Assert.That(Equals(result, "cn"));
+        }
+        [Test]
+        [Order(13)]
+        public async Task TestGetCodeDenmark()
+        {
+            var result = _locationTransformation.GetCountryCode("Denmark");
+            Assert.That(Equals(result, "dk"));
+        }
+        [Test]
+        [Order(14)]
+        public async Task TestGetCodeAustralia()
+        {
+            var result = _locationTransformation.GetCountryCode("Australia");
+            Assert.That(Equals(result, "au"));
+        }
+        [Test]
+        [Order(15)]
+        public async Task TestGetCodeFinland()
+        {
+            var result = _locationTransformation.GetCountryCode("Finland");
+            Assert.That(Equals(result, "fi"));
+        }
+        [Test]
+        [Order(16)]
+        public async Task TestGetCodeFrance()
+        {
+            var result = _locationTransformation.GetCountryCode("France");
+            Assert.That(Equals(result, "fr"));
+        }
+        [Test]
+        [Order(17)]
+        public async Task TestGetCodeMorocco()
+        {
+            var result = _locationTransformation.GetCountryCode("Morocco");
+            Assert.That(Equals(result, "ma"));
+        }
+        [Test]
+        [Order(18)]
+        public async Task TestGetCodeNetherlands()
+        {
+            var result = _locationTransformation.GetCountryCode("Netherlands");
+            Assert.That(Equals(result, "nl"));
+        }
+        [Test]
+        [Order(19)]
+        public async Task TestGetCodeZealand()
+        {
+            var result = _locationTransformation.GetCountryCode("New Zealand");
+            Assert.That(Equals(result, "nz"));
+        }
+        [Test]
+        [Order(20)]
+        public async Task TestGetCodeNorway()
+        {
+            var result = _locationTransformation.GetCountryCode("Norway");
+            Assert.That(Equals(result, "no"));
+        }
+        [Test]
+        [Order(21)]
+        public async Task TestGetCodeUSA()
+        {
+            var result = _locationTransformation.GetCountryCode("United States");
+            Assert.That(Equals(result, "us"));
+        }
+        [Test]
+        [Order(22)]
+        public async Task TestGetCodeCzechRepublic()
+        {
+            var result = _locationTransformation.GetCountryCode("Czech Republic");
+            Assert.That(Equals(result, "Czech Republic"));
         }
 
         [OneTimeTearDown]
