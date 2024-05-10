@@ -12,6 +12,7 @@ namespace Weather.Controllers
     public class WeatherController : ControllerBase
     {
         private readonly WeatherServices _weatherServices = new WeatherServices();
+        private readonly LocationTransformation _locationTransformation = new LocationTransformation();
 
         [HttpGet("actual")]
         public async Task<ActionResult<MyWeatherInfo>> GetActualWeather([FromQuery] string cityName, [FromQuery]string country)
@@ -50,5 +51,36 @@ namespace Weather.Controllers
             return Ok(weather);
         }
 
+        [HttpGet("history")]
+        public async Task<ActionResult<MyWeatherForecast>> GetHistory([FromHeader]string userToken, [FromQuery]string cityName, [FromQuery]string country, [FromQuery]string date)
+        {
+            if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
+            {
+                return Unauthorized("You must be logged in");
+            }
+            Location location; 
+            try
+            {
+                location = await _locationTransformation.GetCoordinates(cityName, country);
+            } 
+            catch (LocationException e)
+            {
+                return NotFound(e.Message);
+            }
+            if (location == null)
+            {
+                return NotFound("Location not found");
+            }
+            HistoryWeather history;
+            try
+            {
+                history = await _weatherServices.GetWeatherHistory(location, DateTime.Parse(date));
+            }
+            catch (HistoryException e)
+            {
+                return BadRequest(e.Message);
+            }
+            return Ok(history);
+        }
     }
 }

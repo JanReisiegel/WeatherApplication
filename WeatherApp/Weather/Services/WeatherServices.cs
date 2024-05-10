@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OpenWeatherMap;
 using OpenWeatherMap.Models;
 using Weather.Models;
@@ -109,14 +110,21 @@ namespace Weather.Services
             return myWeatherForecast;
         }
 
-        public async Task<MyWeatherForecast> GetWeatherHistory(Location location)
+        public async Task<HistoryWeather> GetWeatherHistory(Location location, DateTime weatherDate)
         {
+            if(weatherDate < DateTime.Parse("2010-01-01")) { throw new HistoryException("Date must be after 1st Jan 2010");}
             var client = new HttpClient();
-            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude},{location.Longitude}";
+            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude},{location.Longitude}&dt={weatherDate.ToString("yyyy-MM-dd")}";
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                
+                var text = await response.Content.ReadAsStringAsync();
+                var historyWeather = JsonConvert.DeserializeObject<HistoryWeather>(text);
+                return historyWeather;
+            }
+            else
+            {
+                throw new HistoryException("history not found");
             }
         }
     }
