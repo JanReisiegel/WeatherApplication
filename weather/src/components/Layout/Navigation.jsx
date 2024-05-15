@@ -23,14 +23,10 @@ const Navigation = (props) => {
         <Nav.Item eventKey={1} as={Link} to={"/"}>
           Home
         </Nav.Item>
-        <Nav.Item
-          eventKey={2}
-          as={NavLink}
-          to={"/actual-weather?cityName=Liberec"}
-        >
+        <Nav.Item eventKey={2} as={NavLink} to={"/actual-weather?local=true"}>
           Aktuální počasí
         </Nav.Item>
-        <Nav.Item eventKey={2} as={NavLink} to={"/forecats"}>
+        <Nav.Item eventKey={2} as={NavLink} to={"/forecats?local=true"}>
           Předpověď počasí
         </Nav.Item>
       </Nav>

@@ -12,6 +12,7 @@ namespace Weather.Controllers
     public class LocationsController : ControllerBase
     {
         private readonly LocationServices _locationServices = new LocationServices();
+        private readonly LocationTransformation _locationTransformation = new LocationTransformation();
 
         [HttpGet]
         public async Task<IActionResult> GetSavedLocation([FromHeader]string? userToken, [FromQuery]string customName)
@@ -80,6 +81,21 @@ namespace Weather.Controllers
                 return Ok("Location deleted");
             }
             return StatusCode(StatusCodes.Status500InternalServerError, "Cannot store data in database, please contact admin");
+        }
+
+        [HttpGet("coords")]
+        public async Task<IActionResult> GetLocation([FromQuery]double latitude, [FromQuery]double longitude)
+        {
+            Location location;
+            try
+            {
+                location = await _locationTransformation.GetLocationFromCoords(latitude, longitude);
+            }
+            catch (LocationException e)
+            {
+                return NotFound(e.Message);
+            }
+            return location == null ? StatusCode(StatusCodes.Status204NoContent, "Cannot load data from database, please contact admin") : Ok(location);
         }
     }
 }

@@ -223,6 +223,15 @@ namespace Test
             Assert.That(Equals(result, "Czech Republic"));
         }
 
+        [Test]
+        [Order(23)]
+        public async Task TestGetLocationFromCoordsOK()
+        {
+            var result = await _controller.GetLocation(50.0755, 14.4378) as ObjectResult;
+            Assert.That(Equals((result.Value as Location).CityName, "Prague"));
+            Assert.That(Equals((result.Value as Location).Country, "Czechia"));
+        }
+
         [OneTimeTearDown]
         public void TearDown()
         {

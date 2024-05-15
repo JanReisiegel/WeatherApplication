@@ -9,8 +9,10 @@ export const UserApi = {
 export const WeatherApi = {
   current: "https://localhost:7248/api/Weather/actual",
   forecast: "https://localhost:7248/api/Weather/forecast",
+  historical: "https://localhost:7248/api/Weather/history",
 };
 export const LocationApi = {
   basic: "https://localhost:7248/api/Locations",
   getAll: "https://localhost:7248/api/Locations/all",
+  getLocation: "https://localhost:7248/api/Locations/coords",
 };

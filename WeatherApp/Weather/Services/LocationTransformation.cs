@@ -36,6 +36,23 @@ namespace Weather.Services
                 location.CityName = cityName;
                 location.Latitude = longitude;
                 location.Longitude = latitude;
+                location.Country = country;
+                return location;
+            }
+            throw new LocationException("Město neexistuje");
+        }
+        public async Task<Models.Location> GetLocationFromCoords(double latitude, double longitude)
+        {
+            var gc = new Geocoder(Constants.OpenGeoCodeApiKey);
+            var response = gc.ReverseGeocode(latitude, longitude);
+
+            if (response.Status.Code is 200)
+            {
+                var location = new Models.Location();
+                location.CityName = response.Results[0].Components.City;
+                location.Latitude = latitude;
+                location.Longitude = longitude;
+                location.Country = response.Results[0].Components.Country;
                 return location;
             }
             throw new LocationException("Město neexistuje");

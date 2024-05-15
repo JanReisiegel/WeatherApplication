@@ -57,7 +57,7 @@ namespace Test
         [Test]
         public void TestGetForecastWeather()
         {
-            var response = _controller.GetForecast("Praga", "Czech Republic").Result.Result as ObjectResult; //Nevím proè nefunguje London
+            var response = _controller.GetForecast("Praga", "Czechia").Result.Result as ObjectResult; //Nevím proè nefunguje London
             //var result = await response.Content.ReadAsStringAsync();
             Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));
         }

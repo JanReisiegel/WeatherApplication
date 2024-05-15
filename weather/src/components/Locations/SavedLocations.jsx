@@ -111,7 +111,12 @@ export const SavedLocations = () => {
                         color="violet"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/actual-weather?local=false&cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Teď
                       </Button>
@@ -119,9 +124,27 @@ export const SavedLocations = () => {
                         color="blue"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/actual-weather?local=false&cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Potom
+                      </Button>
+                      <Button
+                        color="orange"
+                        appearance="primary"
+                        as={Link}
+                        to={
+                          "/historicalweather?local=false&cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
+                      >
+                        Historie
                       </Button>
                       <IconButton
                         color="red"
