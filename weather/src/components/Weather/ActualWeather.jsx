@@ -4,7 +4,9 @@ import { LocationApi, WeatherApi } from "../../configuration/API";
 import axios from "axios";
 import { Loading } from "../General/Loading";
 import {
+  Button,
   Col,
+  Divider,
   Grid,
   Input,
   InputGroup,
@@ -17,7 +19,6 @@ import {
 import { MdOutlineSearch } from "react-icons/md";
 import { MyWeatherDescription, MyWeatherIcon } from "./WeatherCondition";
 import { countries } from "./StateOfWorld";
-import { set } from "rsuite/esm/utils/dateUtils";
 
 const ActualWeather = () => {
   const { store } = useContext(AppContext);
@@ -25,82 +26,61 @@ const ActualWeather = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [city, setCity] = useState(String);
-  const [serachWeather, setSearchWeather] = useState(Boolean);
+  const [searchWeather, setSearchWeather] = useState(Boolean);
   const [country, setCountry] = useState(String);
 
   let params = new URLSearchParams(window.location.search);
-  const local = params.get("local") ?? false;
 
   const getLocation = async () => {
     setLoading(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { latitude, longitude } = position.coords;
-        axios
-          .get(
-            LocationApi.getLocation +
-              "?latitude=" +
-              latitude +
-              "&longitude=" +
-              longitude,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "http://localhost:3000",
-              },
-            }
-          )
-          .then((response) => {
-            setError(null);
-            setCity(response.data.cityName);
-            setCountry(response.data.country);
-            setSearchWeather(true);
-          })
-          .catch((error) => {
-            let cityFromParam = params.get("cityName") ?? "Praha";
-            let countryFromParam = params.get("country") ?? "Czechia";
-            setCity(cityFromParam);
-            setCountry(countryFromParam);
-            console.log(city, country);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      });
-    } else {
-      console.log("getLocation");
-      setCity("Praha");
-      setCountry("Czechia");
-      setSearchWeather(true);
-      console.log(city, country);
-    }
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      axios
+        .get(
+          LocationApi.getLocation +
+            "?latitude=" +
+            latitude +
+            "&longitude=" +
+            longitude,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
+            },
+          }
+        )
+        .then((response) => {
+          setError(null);
+          setCity(response.data.cityName);
+          setCountry(response.data.country);
+          setSearchWeather(!searchWeather);
+        })
+        .catch((error) => {
+          let cityFromParam = params.get("cityName") ?? "Praha";
+          let countryFromParam = params.get("country") ?? "Czechia";
+          setCity(cityFromParam);
+          setCountry(countryFromParam);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
   };
 
   useEffect(() => {
-    let location = navigator.permissions
-      .query({
-        name: "geolocation",
-      })
-      .then((result) => {
-        return result.state;
-      });
-    if (local && location !== "denied") {
-      getLocation();
-    }
-    if (city === "" && country === "") {
-      let cityFromParam = params.get("cityName") ?? "Praha";
-      let countryFromParam = params.get("country") ?? "Czechia";
-      setCity(cityFromParam);
-      setCountry(countryFromParam);
-      console.log(city, country);
-    }
+    let cityFromParam = params.get("cityName") ?? "Praha";
+    let countryFromParam = params.get("country") ?? "Czechia";
+    setCity(cityFromParam);
+    setCountry(countryFromParam);
+    console.log(city, country);
+    setSearchWeather(!searchWeather);
   }, []);
 
   useEffect(() => {
     if (city !== "" && country !== "") {
       loadWeather();
     }
-  }, [serachWeather]);
+  }, [searchWeather]);
 
   const loadWeather = () => {
     setLoading(true);
@@ -130,7 +110,7 @@ const ActualWeather = () => {
       });
   };
   const setSearchCity = () => {
-    setSearchWeather(!serachWeather);
+    setSearchWeather(!searchWeather);
   };
   if (loading) {
     return <Loading />;
@@ -158,6 +138,15 @@ const ActualWeather = () => {
           data={countries}
           style={{ width: "242px" }}
         />
+        <Divider>NEBO</Divider>
+        <Button
+          onClick={getLocation}
+          appearance="primary"
+          style={{ textAlign: "center" }}
+          block
+        >
+          Použít aktuální polohu
+        </Button>
       </Col>
       <Col xs={24} sm={24} md={14} lg={17}>
         <Grid fluid>

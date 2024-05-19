@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OpenWeatherMap;
 using OpenWeatherMap.Models;
+using System.Globalization;
 using Weather.Models;
 using Weather.MyExceptions;
 using Weather.ViewModels;
@@ -110,11 +111,10 @@ namespace Weather.Services
             return myWeatherForecast;
         }
 
-        public async Task<HistoryWeather> GetWeatherHistory(Location location, DateTime weatherDate)
+        public async Task<HistoryWeather> GetWeatherHistory(Location location)
         {
-            if(weatherDate < DateTime.Parse("2010-01-01")) { throw new HistoryException("Date must be after 1st Jan 2010");}
             var client = new HttpClient();
-            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude},{location.Longitude}&dt={weatherDate.ToString("yyyy-MM-dd")}";
+            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude.ToString(CultureInfo.InvariantCulture)},{location.Longitude.ToString(CultureInfo.InvariantCulture)}&dt={DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")}&end_dt={DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")}";
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {

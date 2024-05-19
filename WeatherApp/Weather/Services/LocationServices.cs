@@ -14,7 +14,6 @@ namespace Weather.Services
             var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new UserException("User not found");
             Location location = await _locationTransformation.GetCoordinates(cityName, country);
             location.CustomName = customName;
-            location.Country = country;
             user.SavedLocations.Add(location);
             var result = await JsonFileService.UpdateUserAsync(user);
             if (result.Succeeded) { return location; }

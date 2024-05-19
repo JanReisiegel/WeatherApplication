@@ -52,7 +52,7 @@ namespace Weather.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<ActionResult<MyWeatherForecast>> GetHistory([FromHeader]string userToken, [FromQuery]string cityName, [FromQuery]string country, [FromQuery]string date)
+        public async Task<ActionResult<MyWeatherForecast>> GetHistory([FromHeader]string userToken, [FromQuery]string cityName, [FromQuery]string country)
         {
             if (userToken == null || !(await UserServices.GetAuthenticate(UserServices.GetClaims(userToken)["email"])))
             {
@@ -74,7 +74,7 @@ namespace Weather.Controllers
             HistoryWeather history;
             try
             {
-                history = await _weatherServices.GetWeatherHistory(location, DateTime.Parse(date));
+                history = await _weatherServices.GetWeatherHistory(location);
             }
             catch (HistoryException e)
             {

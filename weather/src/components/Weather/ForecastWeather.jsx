@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import {
+  Button,
   Col,
+  Divider,
   Input,
   InputGroup,
   Message,
@@ -27,19 +29,41 @@ export const ForecastWeather = () => {
   const [searchWeather, setSearchWeather] = useState(true);
 
   let params = new URLSearchParams(window.location.search);
-  const local = params.get("local") ?? true;
 
   const getLocation = async () => {
     setLoading(true);
-    console.log("getLocation");
-    if (navigator.geolocation) {
-      let think = navigator.geolocation.getCurrentPosition();
-      console.log(think);
-    } else {
-      setCity("Praha");
-      setCountry("Czech Republic");
-      setSearchWeather(true);
-    }
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      axios
+        .get(
+          LocationApi.getLocation +
+            "?latitude=" +
+            latitude +
+            "&longitude=" +
+            longitude,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
+            },
+          }
+        )
+        .then((response) => {
+          setError(null);
+          setCity(response.data.cityName);
+          setCountry(response.data.country);
+          setSearchWeather(!searchWeather);
+        })
+        .catch((error) => {
+          let cityFromParam = params.get("cityName") ?? "Praha";
+          let countryFromParam = params.get("country") ?? "Czechia";
+          setCity(cityFromParam);
+          setCountry(countryFromParam);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
   };
   const getForecast = () => {
     setLoading(true);
@@ -54,11 +78,9 @@ export const ForecastWeather = () => {
       .then((response) => {
         if (response.status === 200) {
           setWeather(response.data);
-          setLoading(false);
         }
       })
       .catch((error) => {
-        console.log(city, country);
         setError(error);
       })
       .finally(() => {
@@ -67,15 +89,12 @@ export const ForecastWeather = () => {
   };
 
   useEffect(() => {
-    if (local) {
-      getLocation();
-    } else {
-      let cityFromParam = params.get("cityName") ?? "Praha";
-      let countryFromParam = params.get("country") ?? "Czech Republic";
-      setCity(cityFromParam);
-      setCountry(countryFromParam);
-    }
-  }, []);
+    let cityFromParam = params.get("cityName") ?? "Praha";
+    let countryFromParam = params.get("country") ?? "Czech Republic";
+    setCity(cityFromParam);
+    setCountry(countryFromParam);
+    setSearchWeather(!searchWeather);
+  },[]);
 
   useEffect(() => {
     if (city !== "" && country !== "") {
@@ -113,6 +132,10 @@ export const ForecastWeather = () => {
           data={countries}
           style={{ width: "242px" }}
         />
+        <Divider>NEBO</Divider>
+        <Button appearance="primary" onClick={getLocation} block>
+          Použít aktuální polohu
+        </Button>
       </Col>
       <Col xs={24} sm={24} md={14} lg={17}>
         <h3 style={{ textAlign: "center" }}>Předpověď počasí pro {city}</h3>

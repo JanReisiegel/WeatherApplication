@@ -1,158 +1,195 @@
-import { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Auth/AppProvider";
 import { useSearchParams } from "react-router-dom";
 import { Loading } from "../General/Loading";
-import { Col, Grid, Input, InputGroup, Message, Panel, Row, Text } from "rsuite";
-import { Unauthorized } from "../General/Unauthorized";
+import {
+  Col,
+  Divider,
+  Grid,
+  Input,
+  InputGroup,
+  Message,
+  Panel,
+  Row,
+  SelectPicker,
+  Text,
+  Toggle,
+} from "rsuite";
 import { MdOutlineSearch } from "react-icons/md";
-import { MyWeatherIcon } from "./WeatherCondition";
+import { LocationApi, WeatherApi } from "../../configuration/API";
+import { countries } from "./StateOfWorld";
+import Unauthorized from "../General/Unauthorized";
+import axios from "axios";
 
-export const HistoryWeather = () => {
+const HistoryWeather = () => {
   const { store } = useContext(AppContext);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [city, setCity] = useState("");
-  const [serachWeather, setSearchWeather] = useState(true);
+  const [country, setCountry] = useState("");
+  const [searchWeather, setSearchWeather] = useState(true);
+  const [local, setLocal] = useState(false);
+
+  let params = new URLSearchParams(window.location.search);
+
+  const getLocation = async () => {
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      axios
+        .get(
+          LocationApi.getLocation +
+            "?latitude=" +
+            latitude +
+            "&longitude=" +
+            longitude,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
+            },
+          }
+        )
+        .then((response) => {
+          setError(null);
+          setCity(response.data.cityName);
+          setCountry(response.data.country);
+          setSearchWeather(!searchWeather);
+        })
+        .catch((error) => {
+          let cityFromParam = params.get("cityName") ?? "Praha";
+          let countryFromParam = params.get("country") ?? "Czechia";
+          setCity(cityFromParam);
+          setCountry(countryFromParam);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+  };
 
   useEffect(() => {
-    if (serachWeather) {
-      setSearchWeather(false);
-      let cityFromParam = searchParams.get("cityName") ?? "Liberec";
-      setCity(cityFromParam);
-      getForecastWeather(cityFromParam);
+    let cityFromParam = params.get("cityName") ?? "Praha";
+    let countryFromParam = params.get("country") ?? "Czechia";
+    setCity(cityFromParam);
+    setCountry(countryFromParam);
+    setSearchWeather(!searchWeather);
+  }, []);
+  useEffect(() => {
+    if (city !== "" && country !== "") {
+      getHistoryWeather();
     }
-  }, [serachWeather]);
+  }, [searchWeather]);
 
-  const getHistoryWeather = (cityName) => {};
-
+  const getHistoryWeather = () => {
+    setLoading(true);
+    axios
+      .get(
+        WeatherApi.historical + "?cityName=" + city + "&country=" + country,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "http://localhost:3000",
+            userToken: store.token ? store.token : "",
+          },
+        }
+      )
+      .then((response) => {
+        setError(null);
+        setWeather(response.data);
+        console.log(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
+  };
+  if (!store.loggedIn) {
+    return <Unauthorized />;
+  }
   if (loading) {
     return <Loading />;
   }
   if (error) {
-    return <Message type="error" description={error} />;
-  }
-  if (!store.loggedIn) {
-    return <Unauthorized />;
+    return <Message type="error">{error.message}</Message>;
   }
   return (
     <Row>
       <Col xs={24} sm={24} md={10} lg={7}>
         <h3>Město</h3>
-        <InputGroup>
-          <Input value={city} onChange={(e) => setCity(e)} />
-          <InputGroup.Button onClick={setSearchCity}>
-            <MdOutlineSearch />
-          </InputGroup.Button>
-        </InputGroup>
+        <Toggle
+          size="lg"
+          checkedChildren="Vybrat město"
+          unCheckedChildren="Použít aktuální"
+          checked={local}
+          onChange={() => {
+            setLocal(!local);
+            if (local) {
+              getLocation();
+            }
+          }}
+        />
+        <Divider />
+        {local ? (
+          <>
+            <InputGroup>
+              <Input value={city} onChange={(e) => setCity(e)} />
+              <InputGroup.Button onClick={setCity}>
+                <MdOutlineSearch />
+              </InputGroup.Button>
+            </InputGroup>
+            <SelectPicker
+              data={countries}
+              value={country}
+              onChange={(e) => setCountry(e)}
+              style={{ width: "242px" }}
+            />
+          </>
+        ) : null}
       </Col>
       <Col xs={24} sm={24} md={14} lg={17}>
         <h3 style={{ textAlign: "center" }}>Počasí v {city}</h3>
         <Grid fluid>
-          <Row gutter={5}>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel bordered header={<Text color="yellow">Název města</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel
-                style={{ height: "142px" }}
-                bordered
-                header={<Text color="yellow">Zeměpisná šířka</Text>}
-              >
-                <Text style={{ fontSize: "25px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel
-                bordered
-                header={<Text color="yellow">Zeměpisná délka</Text>}
-                style={{ height: "142px" }}
-              >
-                <Text style={{ fontSize: "25px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel bordered header={<Text color="yellow">Počasí</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                  {/*<MyWeatherIcon
-                    weatherCondition={}
-                    size={43}
-  />*/}
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={8}>
-              <Panel bordered header={<Text color="yellow">Teplota</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={8}>
-              <Panel
-                bordered
-                header={<Text color="yellow">Pocitová teplota</Text>}
-              >
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={8} xxl={8}>
-              <Panel bordered header={<Text color="yellow">Oblačnost</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel bordered header={<Text color="yellow">Tlak</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel bordered header={<Text color="yellow">Vlhkost</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
-              <Panel
-                bordered
-                header={<Text color="yellow">Rychlost větru</Text>}
-              >
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={9} xl={6} xxl={6}>
-              <Panel bordered header={<Text color="yellow">Směr větru</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={12} xl={12} xxl={12}>
-              <Panel
-                bordered
-                header={<Text color="yellow">Východ slunce</Text>}
-              >
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
-            <Col xs={24} sm={12} md={12} lg={12} xl={12} xxl={12}>
-              <Panel bordered header={<Text color="yellow">Západ Slunce</Text>}>
-                <Text style={{ fontSize: "40px", textAlign: "center" }}>
-                </Text>
-              </Panel>
-            </Col>
+          <Row>
+            {weather?.forecast.forecastday.map((day) => {
+              return (
+                <Col xs={24} sm={24} md={12} lg={8} xl={6} xxl={5}>
+                  <Panel
+                    header={
+                      <Text align="center" color="green" size={23}>
+                        {day.date.split("-").reverse().join(". ")}
+                      </Text>
+                    }
+                    bordered
+                  >
+                    <p>
+                      <Text align="center">Průměrná teplota:</Text>
+                      <Text color="yellow" align="center">
+                        {day.day.avgTempC}°C
+                      </Text>
+                    </p>
+
+                    <Divider />
+                    <Text align="center">Maximální teplota:</Text>
+                    <Text color="red" align="center">
+                      {day.day.maxTempC}°C
+                    </Text>
+                    <Divider />
+                    <Text align="center">Minimální teplota:</Text>
+                    <Text color="blue" align="center">
+                      {day.day.minTempC}°C
+                    </Text>
+                  </Panel>
+                </Col>
+              );
+            })}
           </Row>
         </Grid>
       </Col>
     </Row>
-  )
+  );
 };
+
+export default HistoryWeather;

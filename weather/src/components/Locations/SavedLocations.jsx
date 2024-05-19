@@ -83,7 +83,7 @@ export const SavedLocations = () => {
           <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
             <IconButton
               as={Link}
-              to={"/add-location"}
+              to={"/locations/add"}
               color="green"
               appearance="primary"
               icon={<MdAddCircleOutline size={36} />}
@@ -112,7 +112,7 @@ export const SavedLocations = () => {
                         appearance="primary"
                         as={Link}
                         to={
-                          "/actual-weather?local=false&cityName=" +
+                          "/actual?local=false&cityName=" +
                           location.cityName +
                           "&country=" +
                           location.country
@@ -125,7 +125,7 @@ export const SavedLocations = () => {
                         appearance="primary"
                         as={Link}
                         to={
-                          "/actual-weather?local=false&cityName=" +
+                          "/forecast?cityName=" +
                           location.cityName +
                           "&country=" +
                           location.country
@@ -138,7 +138,7 @@ export const SavedLocations = () => {
                         appearance="primary"
                         as={Link}
                         to={
-                          "/historicalweather?local=false&cityName=" +
+                          "/history?cityName=" +
                           location.cityName +
                           "&country=" +
                           location.country
