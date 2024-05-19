@@ -10,5 +10,6 @@ namespace Weather.Models
         public double Longitude { get; set; }
         public string? CityName { get; set; }
         public string? CustomName { get; set; }
+        public string? Country { get; set; }
     }
 }

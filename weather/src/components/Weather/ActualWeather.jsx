@@ -1,53 +1,95 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Auth/AppProvider";
-import { WeatherApi } from "../../configuration/API";
-import { useSearchParams } from "react-router-dom";
+import { LocationApi, WeatherApi } from "../../configuration/API";
 import axios from "axios";
-import { GuardSpinner } from "react-spinners-kit";
 import { Loading } from "../General/Loading";
 import {
   Button,
   Col,
-  Container,
-  FlexboxGrid,
+  Divider,
   Grid,
   Input,
   InputGroup,
   Message,
   Panel,
   Row,
-  Sidebar,
-  Sidenav,
+  SelectPicker,
   Text,
 } from "rsuite";
 import { MdOutlineSearch } from "react-icons/md";
-import { set } from "rsuite/esm/utils/dateUtils";
-import { MyWeatherIcon } from "./MyWeatherIcon";
+import { MyWeatherDescription, MyWeatherIcon } from "./WeatherCondition";
+import { countries } from "./StateOfWorld";
 
 const ActualWeather = () => {
   const { store } = useContext(AppContext);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [city, setCity] = useState("");
-  const [serachWeather, setSearchWeather] = useState(true);
+  const [city, setCity] = useState(String);
+  const [searchWeather, setSearchWeather] = useState(Boolean);
+  const [country, setCountry] = useState(String);
+
+  let params = new URLSearchParams(window.location.search);
+
+  const getLocation = async () => {
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      axios
+        .get(
+          LocationApi.getLocation +
+            "?latitude=" +
+            latitude +
+            "&longitude=" +
+            longitude,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
+            },
+          }
+        )
+        .then((response) => {
+          setError(null);
+          setCity(response.data.cityName);
+          setCountry(response.data.country);
+          setSearchWeather(!searchWeather);
+        })
+        .catch((error) => {
+          let cityFromParam = params.get("cityName") ?? "Praha";
+          let countryFromParam = params.get("country") ?? "Czechia";
+          setCity(cityFromParam);
+          setCountry(countryFromParam);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+  };
 
   useEffect(() => {
-    //console.log(cityFromParam);
-    //console.log(city);
-    if (serachWeather) {
-      setSearchWeather(false);
-      let cityFromParam = searchParams.get("cityName") ?? "Liberec";
-      setCity(cityFromParam);
-      //console.log(cityFromParam);
-      loadWeather(cityFromParam);
-    }
-  }, [serachWeather]);
+    let cityFromParam = params.get("cityName") ?? "Praha";
+    let countryFromParam = params.get("country") ?? "Czechia";
+    setCity(cityFromParam);
+    setCountry(countryFromParam);
+    console.log(city, country);
+    setSearchWeather(!searchWeather);
+  }, []);
 
-  const loadWeather = (cityName) => {
+  useEffect(() => {
+    if (city !== "" && country !== "") {
+      loadWeather();
+    }
+  }, [searchWeather]);
+
+  const loadWeather = () => {
+    setLoading(true);
+    console.log("loadWeather", city, country, city === "" && country === "");
+    if (city === "" || country === "") {
+      getLocation();
+    }
     axios
-      .get(WeatherApi.current + "?cityName=" + cityName, {
+      .get(WeatherApi.current + "?cityName=" + city + "&country=" + country, {
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "http://localhost:3000",
@@ -55,27 +97,30 @@ const ActualWeather = () => {
         },
       })
       .then((response) => {
-        console.log(response);
+        setError(null);
         if (response.status === 200) {
           setWeather(response.data);
         }
-        searchParams.set("cityName", city);
       })
       .catch((error) => {
-        //setError(error);
+        setError(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
   const setSearchCity = () => {
-    searchParams.set("cityName", city);
-    //setSearchParams("cityName", city);
-    setSearchWeather(true);
+    setSearchWeather(!searchWeather);
   };
-
   if (loading) {
     return <Loading />;
   }
   if (error) {
-    return <Message type="error" description={error} />;
+    return (
+      <Message type="error">
+        {error.message ? error.message : "Něco se pokazilo"}
+      </Message>
+    );
   }
   return (
     <Row>
@@ -87,10 +132,33 @@ const ActualWeather = () => {
             <MdOutlineSearch />
           </InputGroup.Button>
         </InputGroup>
+        <SelectPicker
+          value={country}
+          onChange={setCountry}
+          data={countries}
+          style={{ width: "242px" }}
+        />
+        <Divider>NEBO</Divider>
+        <Button
+          onClick={getLocation}
+          appearance="primary"
+          style={{ textAlign: "center" }}
+          block
+        >
+          Použít aktuální polohu
+        </Button>
       </Col>
       <Col xs={24} sm={24} md={14} lg={17}>
-        <h3 style={{ textAlign: "center" }}>Počasí v {city}</h3>
         <Grid fluid>
+          <Row>
+            <Col xs={24} sm={24} md={24} lg={24} xl={24} xxl={24}>
+              <MyWeatherDescription
+                weatherCondition={weather?.condition}
+                cityName={weather?.location.cityName}
+                time={weather?.acquireDateTime}
+              />
+            </Col>
+          </Row>
           <Row gutter={5}>
             <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
               <Panel bordered header={<Text color="yellow">Název města</Text>}>

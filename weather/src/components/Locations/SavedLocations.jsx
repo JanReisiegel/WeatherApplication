@@ -83,7 +83,7 @@ export const SavedLocations = () => {
           <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
             <IconButton
               as={Link}
-              to={"/add-location"}
+              to={"/locations/add"}
               color="green"
               appearance="primary"
               icon={<MdAddCircleOutline size={36} />}
@@ -111,7 +111,12 @@ export const SavedLocations = () => {
                         color="violet"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/actual?local=false&cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Teď
                       </Button>
@@ -119,9 +124,27 @@ export const SavedLocations = () => {
                         color="blue"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/forecast?cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Potom
+                      </Button>
+                      <Button
+                        color="orange"
+                        appearance="primary"
+                        as={Link}
+                        to={
+                          "/history?cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
+                      >
+                        Historie
                       </Button>
                       <IconButton
                         color="red"

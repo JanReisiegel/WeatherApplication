@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OpenCage.Geocode;
 using Weather.Models;
 using Weather.MyExceptions;
 using Weather.ViewModels;
@@ -8,22 +9,19 @@ namespace Weather.Services
 {
     public class LocationTransformation
     {
-        public async Task<Location> GetCoordinates(string cityName)
+        public async Task<Models.Location> GetCoordinates(string cityName, string country)
         {
-            var httpClient = new HttpClient();
-            var url = $"https://api.opencagedata.com/geocode/v1/json?q={cityName}&key={Constants.OpenGeoCodeApiKey}";
-            var response = await httpClient.GetAsync(url);
+            var gc = new Geocoder(Constants.OpenGeoCodeApiKey);
+            var response = gc.Geocode(cityName, countrycode: GetCountryCode(country));
 
-            if(response.IsSuccessStatusCode)
+            if (response.Status.Code is 200)
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var res = JsonConvert.DeserializeObject<GeocodingClass>(json);
                 double latitude;
                 double longitude;
                 try
                 {
-                    latitude = res.Results.Average(x => x.Geometry.latitude);
-                    longitude = res.Results.Average(x => x.Geometry.longitude);
+                    latitude = response.Results.Average(x =>x.Geometry.Latitude);
+                    longitude = response.Results.Average(x => x.Geometry.Longitude);
                 }
                 catch (InvalidOperationException e)
                 {
@@ -34,13 +32,48 @@ namespace Weather.Services
                     throw new LocationException("Zadejte název města");
                 }
                 
-                var location = new Location();
+                var location = new Models.Location();
                 location.CityName = cityName;
                 location.Latitude = longitude;
                 location.Longitude = latitude;
+                location.Country = country;
                 return location;
             }
             throw new LocationException("Město neexistuje");
+        }
+        public async Task<Models.Location> GetLocationFromCoords(double latitude, double longitude)
+        {
+            var gc = new Geocoder(Constants.OpenGeoCodeApiKey);
+            var response = gc.ReverseGeocode(latitude, longitude);
+
+            if (response.Status.Code is 200)
+            {
+                var location = new Models.Location();
+                location.CityName = response.Results[0].Components.City;
+                location.Latitude = latitude;
+                location.Longitude = longitude;
+                location.Country = response.Results[0].Components.Country;
+                return location;
+            }
+            throw new LocationException("Město neexistuje");
+        }
+        public string GetCountryCode(string country)
+        {
+            return country.ToLower() switch
+            {
+                "australia" => "au",
+                "china" => "cn",
+                "denmark" => "dk",
+                "finland" => "fi",
+                "france" => "fr",
+                "morocco" => "ma",
+                "netherlands" => "nl",
+                "new zealand" => "nz",
+                "norway" => "no",
+                "united kingdom" => "gb",
+                "united states" => "us",
+                _ => country,
+            };
         }
     }
 }
