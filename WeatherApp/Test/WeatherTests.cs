@@ -67,14 +67,14 @@ namespace Test
         {
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var response = _controller.GetHistory(token, "London", "United Kingdom", DateTime.Now.AddYears(-1).ToString()).Result.Result as ObjectResult;
+            var response = _controller.GetHistory(token, "London", "United Kingdom").Result.Result as ObjectResult;
             Assert.That(Equals(StatusCodes.Status200OK, response.StatusCode));
         }
 
         [Test]
         public void TestGetHistoryUnauthorized()
         {
-            var response = _controller.GetHistory(null, "London", "United Kingdom", DateTime.Now.AddYears(-1).ToString()).Result.Result as ObjectResult;
+            var response = _controller.GetHistory(null, "London", "United Kingdom").Result.Result as ObjectResult;
             Assert.That(Equals(StatusCodes.Status401Unauthorized, response.StatusCode));
         }
 
@@ -83,7 +83,7 @@ namespace Test
         {
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var response = _controller.GetHistory(token, "AGUGUDG", "France", DateTime.Now.AddYears(-1).ToString()).Result.Result as ObjectResult;
+            var response = _controller.GetHistory(token, "AGUGUDG", "France").Result.Result as ObjectResult;
             Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
         }
 
@@ -92,7 +92,7 @@ namespace Test
         {
             var login = _usersController.Login(_loginModel).Result as ObjectResult;
             var token = tokenParse(login.Value.ToString());
-            var response = _controller.GetHistory(token, "London", "United Kingdom", DateTime.Now.AddYears(-20).ToString()).Result.Result as ObjectResult;
+            var response = _controller.GetHistory(token, "London", "United Kingdom").Result.Result as ObjectResult;
             Assert.That(Equals(StatusCodes.Status400BadRequest, response.StatusCode));
             Assert.That(Equals("Date must be after 1st Jan 2010", response.Value));
         }
