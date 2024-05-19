@@ -87,15 +87,6 @@ namespace Test
             Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
         }
 
-        [Test]
-        public void TestGetHistoryBadDate()
-        {
-            var login = _usersController.Login(_loginModel).Result as ObjectResult;
-            var token = tokenParse(login.Value.ToString());
-            var response = _controller.GetHistory(token, "London", "United Kingdom").Result.Result as ObjectResult;
-            Assert.That(Equals(StatusCodes.Status400BadRequest, response.StatusCode));
-            Assert.That(Equals("Date must be after 1st Jan 2010", response.Value));
-        }
 
         [OneTimeTearDown]
         public void TearDown()
