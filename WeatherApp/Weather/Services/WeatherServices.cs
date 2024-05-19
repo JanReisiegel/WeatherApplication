@@ -4,7 +4,6 @@ using OpenWeatherMap;
 using OpenWeatherMap.Models;
 using System.Globalization;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -34,10 +33,6 @@ namespace Weather.Services
             try
             {
                 location = await _locationTransformation.GetCoordinates(cityName, country);
-            }
-            catch (LocationException e)
-            {
-                throw new LocationException(e.Message);
             }
             catch (Exception e)
             {
@@ -69,10 +64,6 @@ namespace Weather.Services
             try
             {
                 location = await _locationTransformation.GetCoordinates(cityName, country);
-            }
-            catch (LocationException e)
-            {
-                throw new LocationException(e.Message);
             }
             catch (Exception e)
             {
@@ -124,7 +115,7 @@ namespace Weather.Services
             }
             else
             {
-                throw new HistoryException("history not found");
+                throw new Exception("history not found");
             }
         }
     }

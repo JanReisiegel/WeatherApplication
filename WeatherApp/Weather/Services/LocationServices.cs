@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -11,7 +10,7 @@ namespace Weather.Services
         private readonly LocationTransformation _locationTransformation = new LocationTransformation();
         public async Task<Location> StoreLocation(string cityName, string country, string customName, ApplicationUser userInput)
         {
-            var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new UserException("User not found");
+            var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new Exception("User not found");
             Location location = await _locationTransformation.GetCoordinates(cityName, country);
             location.CustomName = customName;
             user.SavedLocations.Add(location);
@@ -27,7 +26,7 @@ namespace Weather.Services
         public async Task<Location> GetLocation(string cityName, ApplicationUser user)
         {
             var existUser = await JsonFileService.GetUserAsync(user.Email);
-            Location result = existUser.SavedLocations.FirstOrDefault(x => x.CityName == cityName) ?? throw new LocationException("Location not found");
+            Location result = existUser.SavedLocations.FirstOrDefault(x => x.CityName == cityName) ?? throw new Exception("Location not found");
             return result;
         }
         public async Task<Location> GetLocation(string cityName, string country)

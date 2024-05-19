@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.Services;
 using Weather.ViewModels;
 
@@ -66,7 +65,7 @@ namespace Weather.Controllers
                 return Unauthorized("You need to be logged in to delete your account");
             }
             try { claims = UserServices.GetClaims(userToken); }
-            catch(TokenException e) { return StatusCode(StatusCodes.Status406NotAcceptable,e.Message); }
+            catch(Exception e) { return StatusCode(StatusCodes.Status406NotAcceptable,e.Message); }
             if (await UserServices.GetAuthenticate(claims["email"]) == false) return Unauthorized("You need to be logged in to delete your account");
             if (claims["email"] != loginModel.Email) return Unauthorized("You can only delete your own account");
             var user = await JsonFileService.GetUserAsync(claims["email"]);
@@ -75,7 +74,7 @@ namespace Weather.Controllers
             {
                 result = await JsonFileService.DeleteUserAsync(loginModel);
             }
-            catch(UserException e)
+            catch(Exception e)
             {
                 return Unauthorized(e.Message);
             }
@@ -95,7 +94,7 @@ namespace Weather.Controllers
                 return Unauthorized("You need to be logged in to delete your account");
             }
             try { claims = UserServices.GetClaims(userToken); }
-            catch (TokenException e) { return Unauthorized(e.Message); }
+            catch (Exception e) { return Unauthorized(e.Message); }
             if (await UserServices.GetAuthenticate(claims["email"]) == false) return Unauthorized("You need to be logged in to delete your account");
             if (claims["email"] != model.Email) return Unauthorized("You can only update your own account");
             var user = await JsonFileService.GetUserAsync(claims["email"]);

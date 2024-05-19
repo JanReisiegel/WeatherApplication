@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -55,7 +54,7 @@ namespace Weather.Services
             ApplicationUser user = users.FirstOrDefault(u => u.Email == input.Email);
             if (user != null)
             {
-                throw new UserException("User already exists");
+                throw new Exception("User already exists");
             }
             var hasher = new PasswordHasher<ApplicationUser>();
             users.Add(new ApplicationUser
@@ -77,7 +76,7 @@ namespace Weather.Services
         public static async Task<IdentityResult> UpdateUserAsync(UserVM input)
         {
             var users = await ReadFromFileAsync();
-            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new UserException("User not found");
+            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new Exception("User not found");
             users.Remove(existingUser);
             var hasher = new PasswordHasher<ApplicationUser>();
             var updatedUser = new ApplicationUser
@@ -102,7 +101,7 @@ namespace Weather.Services
         public static async Task<IdentityResult> UpdateUserAsync(ApplicationUser input)
         {
             var users = await ReadFromFileAsync();
-            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new UserException("User not found");
+            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new Exception("User not found");
             users.Remove(existingUser);
             users.Add(input);
             await WriteToFileAsync(users);
@@ -112,11 +111,11 @@ namespace Weather.Services
         public static async Task<IdentityResult> DeleteUserAsync(LoginModel input)
         {
             var users = await ReadFromFileAsync();
-            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new UserException("User not found");
+            var existingUser = users.FirstOrDefault(u => u.Email == input.Email) ?? throw new Exception("User not found");
             var hasher = new PasswordHasher<ApplicationUser>();
             if(hasher.VerifyHashedPassword(null, existingUser.PasswordHash, input.Password) != PasswordVerificationResult.Success)
             {
-                throw new UserException("Invalid password");
+                throw new Exception("Invalid password");
             }
             users.Remove(existingUser);
             await WriteToFileAsync(users);

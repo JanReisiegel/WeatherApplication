@@ -45,14 +45,14 @@ namespace Test
         {
             var response = _controller.GetActualWeather("AGUGUDG", "France").Result.Result as ObjectResult;
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
+            Assert.That(Equals(StatusCodes.Status500InternalServerError, response.StatusCode));
         }
         [Test]
         public void TestGetForecastNotFound()
         {
             var response = _controller.GetForecast("AGUGUDG", "Japan").Result.Result as ObjectResult;
             //var result = await response.Content.ReadAsStringAsync();
-            Assert.That(Equals(StatusCodes.Status404NotFound, response.StatusCode));
+            Assert.That(Equals(StatusCodes.Status500InternalServerError, response.StatusCode));
         }
         [Test]
         public void TestGetForecastWeather()

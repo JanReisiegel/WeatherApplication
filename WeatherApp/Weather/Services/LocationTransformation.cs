@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using OpenCage.Geocode;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -25,11 +24,11 @@ namespace Weather.Services
                 }
                 catch (InvalidOperationException e)
                 {
-                    throw new LocationException("Město neexistuje");
+                    throw new Exception("Město neexistuje");
                 }
                 catch (ArgumentNullException e)
                 {
-                    throw new LocationException("Zadejte název města");
+                    throw new Exception("Zadejte název města");
                 }
                 
                 var location = new Models.Location();
@@ -39,7 +38,7 @@ namespace Weather.Services
                 location.Country = country;
                 return location;
             }
-            throw new LocationException("Město neexistuje");
+            throw new Exception("Město neexistuje");
         }
         public async Task<Models.Location> GetLocationFromCoords(double latitude, double longitude)
         {
@@ -55,7 +54,7 @@ namespace Weather.Services
                 location.Country = response.Results[0].Components.Country;
                 return location;
             }
-            throw new LocationException("Město neexistuje");
+            throw new Exception("Město neexistuje");
         }
         public string GetCountryCode(string country)
         {

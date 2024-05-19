@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.Services;
 
 namespace Weather.Controllers
@@ -27,7 +26,7 @@ namespace Weather.Controllers
             {
                 location = await _locationServices.GetLocation(user, customName);
             } 
-            catch (LocationException e)
+            catch (Exception e)
             {
                 return NotFound(e.Message);
             }
@@ -91,7 +90,7 @@ namespace Weather.Controllers
             {
                 location = await _locationTransformation.GetLocationFromCoords(latitude, longitude);
             }
-            catch (LocationException e)
+            catch (Exception e)
             {
                 return NotFound(e.Message);
             }

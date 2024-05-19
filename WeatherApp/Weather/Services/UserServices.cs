@@ -4,7 +4,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Weather.Models;
-using Weather.MyExceptions;
 
 namespace Weather.Services
 {
@@ -54,7 +53,7 @@ namespace Weather.Services
             }
             catch(Exception e)
             {
-                throw new TokenException(e.Message);
+                throw new Exception(e.Message);
             }
         }
 

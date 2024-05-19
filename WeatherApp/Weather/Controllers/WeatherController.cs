@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.Services;
 using Weather.ViewModels;
 
@@ -19,7 +18,6 @@ namespace Weather.Controllers
         {
             MyWeatherInfo weather;
             try { weather = await _weatherServices.GetActualWeather(cityName, country); }
-            catch (LocationException e) { return NotFound(e.Message); }
             catch (Exception e) { return StatusCode(StatusCodes.Status500InternalServerError, e.Message); }
             if (weather == null)
             {
@@ -34,10 +32,6 @@ namespace Weather.Controllers
             try
             {
                 weather = await _weatherServices.GetWeatherForecast5Days(cityName, country);
-            }
-            catch (LocationException e)
-            {
-                return NotFound(e.Message);
             }
             catch (Exception e)
             {
@@ -63,7 +57,7 @@ namespace Weather.Controllers
             {
                 location = await _locationTransformation.GetCoordinates(cityName, country);
             } 
-            catch (LocationException e)
+            catch (Exception e)
             {
                 return NotFound(e.Message);
             }
@@ -76,7 +70,7 @@ namespace Weather.Controllers
             {
                 history = await _weatherServices.GetWeatherHistory(location);
             }
-            catch (HistoryException e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
