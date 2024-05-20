@@ -3,7 +3,6 @@ import { AppContext } from "../Auth/AppProvider";
 import axios from "axios";
 import { LocationApi } from "../../configuration/API";
 import { Loading } from "../General/Loading";
-import Unauthorized from "../General/Unauthorized";
 import {
   Button,
   ButtonGroup,
@@ -15,8 +14,9 @@ import {
   Row,
 } from "rsuite";
 import { Link } from "react-router-dom";
-import { MdAddCircleOutline, MdOutlineModeEdit } from "react-icons/md";
+import { MdAddCircleOutline } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
+import Unauthorized from "../General/Unauthorized";
 
 export const SavedLocations = () => {
   const { store } = useContext(AppContext);
@@ -28,6 +28,7 @@ export const SavedLocations = () => {
     getSavedlocations();
   }, []);
   const getSavedlocations = () => {
+    setLoading(true);
     axios
       .get(LocationApi.getAll, {
         headers: {
@@ -36,16 +37,19 @@ export const SavedLocations = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           setLocations(response.data);
         }
       })
       .catch((error) => {
-        console.error(error);
+        setError(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
   const deleteLocation = (customName) => {
+    setLoading(true);
     axios
       .delete(LocationApi.basic + "?customName=" + customName, {
         headers: {
@@ -54,21 +58,25 @@ export const SavedLocations = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           getSavedlocations();
         }
       })
       .catch((error) => {
-        console.error(error);
+        setError(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
-
+  if (!store.loggedIn) {
+    return <Unauthorized />;
+  }
   if (loading) {
     return <Loading />;
   }
   if (error || !store.loggedIn) {
-    return <Unauthorized />;
+    return <Message type="error">{error}</Message>;
   }
   return (
     <Row>

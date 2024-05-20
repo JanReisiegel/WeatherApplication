@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Auth/AppProvider";
-import { useSearchParams } from "react-router-dom";
 import { Loading } from "../General/Loading";
 import {
   Col,

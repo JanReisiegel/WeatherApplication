@@ -5,7 +5,7 @@ import { UserApi } from "../../configuration/API";
 import { AppContext } from "../Auth/AppProvider";
 
 export const MenuLogin = () => {
-  const { store, dispatch } = useContext(AppContext);
+  const { dispatch } = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);

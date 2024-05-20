@@ -10,7 +10,7 @@ import { TbMist } from "react-icons/tb";
 import { WiDust, WiSandstorm, WiSmoke, WiTornado } from "react-icons/wi";
 import { VscError } from "react-icons/vsc";
 import { TiWeatherStormy } from "react-icons/ti";
-import { Heading, Text } from "rsuite";
+import { Heading } from "rsuite";
 
 export const MyWeatherIcon = ({ weatherCondition, size }) => {
   switch (weatherCondition) {

@@ -11,9 +11,9 @@ export const MenuRegister = () => {
   const [username, setUsername] = useState("");
   const [visible, setVisible] = useState(false);
   const [response, setResponse] = useState(Number);
+  const [error, setError] = useState(null);
 
   const registerAction = () => {
-    console.log(email, password, phoneNo, username);
     axios
       .post(
         UserApi.register,
@@ -30,7 +30,6 @@ export const MenuRegister = () => {
         }
       )
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           setResponse(200);
           setEmail("");
@@ -40,10 +39,13 @@ export const MenuRegister = () => {
         }
       })
       .catch((error) => {
-        console.error(error);
+        setError(error);
       });
   };
 
+  if (error) {
+    return <Message type="error">{error}</Message>;
+  }
   return (
     <>
       <Nav.Item onClick={() => setVisible(!visible)}>Registrovat</Nav.Item>
