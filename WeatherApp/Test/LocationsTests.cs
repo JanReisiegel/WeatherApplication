@@ -143,6 +143,7 @@ namespace Test
         public async Task TestGetCodeBritain()
         {
             var result = _locationTransformation.GetCountryCode("United Kingdom");
+            TestContext.WriteLine(result);
             Assert.That(Equals(result, "gb"));
         }
         [Test]

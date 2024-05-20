@@ -58,7 +58,7 @@ namespace Weather.Services
         }
         public string GetCountryCode(string country)
         {
-            return country.ToLower() switch
+            return country.ToLower().Replace(" ", "") switch
             {
                 "australia" => "au",
                 "china" => "cn",
