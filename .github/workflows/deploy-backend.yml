@@ -6,31 +6,31 @@ on:
       - main
 
 jobs:
-    build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-                uses: actions/checkout@v2
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Setup .NET Core
-                uses: actions/setup-dotnet@v1
-                with:
-                    dotnet-version: '8.0.x'
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+            dotnet-version: '8.0.x'
             
-            - name: Build project
-                run: |
-                    cd WeatherApp
-                    dotnet build ./Weather/Weather.csproj --configuration Release
+      - name: Build project
+        run: |
+            cd WeatherApp
+            dotnet build ./Weather/Weather.csproj --configuration Release
             
-            - name: Publish project
-                run: |
-                    cd WeatherApp
-                    dotnet publish ./Weather/Weather.csproj --configuration Release --output ./publish
+      - name: Publish project
+        run: |
+            cd WeatherApp
+            dotnet publish ./Weather/Weather.csproj --configuration Release --output ./publish
 
-            - name: Deploy to Azure Web App
-                uses: azure/webapps-deploy@v2
-                with:
-                    app-name: 'StinWeatherApi'
-                    slot-name: 'production'
-                    publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-                    package: ./WeatherApp/publish
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+            app-name: 'StinWeatherApi'
+            slot-name: 'production'
+            publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+            package: ./WeatherApp/publish
