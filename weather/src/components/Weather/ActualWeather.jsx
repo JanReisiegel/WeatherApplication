@@ -73,7 +73,7 @@ const ActualWeather = () => {
     setCountry(countryFromParam);
     console.log(city, country);
     setSearchWeather(!searchWeather);
-  }, []);
+  });
 
   useEffect(() => {
     if (city !== "" && country !== "") {

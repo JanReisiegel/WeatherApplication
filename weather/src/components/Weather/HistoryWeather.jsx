@@ -73,7 +73,7 @@ const HistoryWeather = () => {
     setCity(cityFromParam);
     setCountry(countryFromParam);
     setSearchWeather(!searchWeather);
-  }, []);
+  });
   useEffect(() => {
     if (city !== "" && country !== "") {
       getHistoryWeather();

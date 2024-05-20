@@ -100,7 +100,7 @@ export const ForecastWeather = () => {
     setCity(cityFromParam);
     setCountry(countryFromParam);
     setSearchWeather(!searchWeather);
-  }, []);
+  });
 
   useEffect(() => {
     if (city !== "" && country !== "") {
