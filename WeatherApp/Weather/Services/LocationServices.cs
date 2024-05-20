@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -9,10 +8,10 @@ namespace Weather.Services
     public class LocationServices
     {
         private readonly LocationTransformation _locationTransformation = new LocationTransformation();
-        public async Task<Location> StoreLocation(string cityName, string customName, ApplicationUser userInput)
+        public async Task<Location> StoreLocation(string cityName, string country, string customName, ApplicationUser userInput)
         {
-            var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new UserException("User not found");
-            Location location = await _locationTransformation.GetCoordinates(cityName);
+            var user = await JsonFileService.GetUserAsync(userInput.Email) ?? throw new Exception("User not found");
+            Location location = await _locationTransformation.GetCoordinates(cityName, country);
             location.CustomName = customName;
             user.SavedLocations.Add(location);
             var result = await JsonFileService.UpdateUserAsync(user);
@@ -27,12 +26,12 @@ namespace Weather.Services
         public async Task<Location> GetLocation(string cityName, ApplicationUser user)
         {
             var existUser = await JsonFileService.GetUserAsync(user.Email);
-            Location result = existUser.SavedLocations.FirstOrDefault(x => x.CityName == cityName) ?? throw new LocationException("Location not found");
+            Location result = existUser.SavedLocations.FirstOrDefault(x => x.CityName == cityName) ?? throw new Exception("Location not found");
             return result;
         }
-        public async Task<Location> GetLocation(string cityName)
+        public async Task<Location> GetLocation(string cityName, string country)
         {
-            var location = await _locationTransformation.GetCoordinates(cityName);
+            var location = await _locationTransformation.GetCoordinates(cityName, country);
             return location;
         }
         public async Task<List<Location>> GetAllLocations(ApplicationUser user)

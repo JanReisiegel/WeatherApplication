@@ -24,22 +24,25 @@ builder.Services.AddScoped<LocationTransformation>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("corsdef", builder =>
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AddPolicy("corsdef", policy =>
         {
-            builder.AllowAnyOrigin()
+            policy.AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("corsdef", builder =>
+    }
+    else
+    {
+        options.AddPolicy("corsdef", policy =>
         {
-            builder.AllowAnyOrigin()
+            policy.WithOrigins("https://JanReisiegel.github.io")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
+    }
+    
 });
 
 var app = builder.Build();

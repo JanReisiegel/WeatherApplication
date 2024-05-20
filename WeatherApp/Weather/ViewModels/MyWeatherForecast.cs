@@ -16,14 +16,9 @@ namespace Weather.ViewModels
     public class MyForecastItem
     {
         public DateTime? DateTime { get; set; }
-        //srážky
-        public double? Rain1h { get; set; }
-        public double? Rain3h { get; set; }
         //Teplota
         public double? Temperature { get; set; }
         public double? FeelsTemperature { get; set; }
-        public double? MinTemperature { get; set; }
-        public double? MaxTemperature { get; set; }
         public double? Pressure { get; set; }
         public double? Humidity { get; set; }
         //vítr

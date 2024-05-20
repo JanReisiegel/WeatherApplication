@@ -20,32 +20,27 @@ const Navigation = (props) => {
         Weather App
       </Navbar.Brand>
       <Nav>
-        <Nav.Item eventKey={1} as={Link} to={"/"}>
-          Home
-        </Nav.Item>
-        <Nav.Item
-          eventKey={2}
-          as={NavLink}
-          to={"/actual-weather?cityName=Liberec"}
-        >
+        <Nav.Item eventKey={1} as={NavLink} to={"/actual"}>
           Aktuální počasí
         </Nav.Item>
-        <Nav.Item eventKey={2} as={NavLink} to={"/forecats"}>
+        <Nav.Item eventKey={2} as={NavLink} to={"/forecast"}>
           Předpověď počasí
         </Nav.Item>
+        {store.loggedIn ? (
+          <Nav.Item eventKey={3} as={NavLink} to={"/history"}>
+            Historické počasí
+          </Nav.Item>
+        ) : null}
       </Nav>
       <Nav pullRight>
         {store.loggedIn ? (
           <>
             <Nav.Menu title={store.user.userName} trigger="click">
-              <Nav.Item eventKey={3} as={Link} to={"/saved-locations"}>
+              <Nav.Item as={Link} to={"/locations"}>
                 Uložená místa
               </Nav.Item>
             </Nav.Menu>
-            <Nav.Item
-              eventKey={4}
-              onClick={() => dispatch({ type: "USER_SIGNOUT" })}
-            >
+            <Nav.Item onClick={() => dispatch({ type: "USER_SIGNOUT" })}>
               Logout
             </Nav.Item>
           </>

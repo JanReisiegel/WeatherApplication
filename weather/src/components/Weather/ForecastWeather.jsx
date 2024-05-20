@@ -1,76 +1,126 @@
 import { useContext, useEffect, useState } from "react";
 import { MdOutlineSearch } from "react-icons/md";
 import {
+  Button,
   Col,
-  FlexboxGrid,
+  Divider,
   Input,
   InputGroup,
   Message,
   Panel,
   Row,
+  SelectPicker,
   Text,
 } from "rsuite";
 import { AppContext } from "../Auth/AppProvider";
-import { useSearchParams } from "react-router-dom";
 import { Loading } from "../General/Loading";
-import { WeatherApi } from "../../configuration/API";
+import { LocationApi, WeatherApi } from "../../configuration/API";
 import axios from "axios";
-import { MyWeatherIcon } from "./MyWeatherIcon";
+import { MyWeatherIcon } from "./WeatherCondition";
+import { countries } from "./StateOfWorld";
 
 export const ForecastWeather = () => {
   const { store } = useContext(AppContext);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [city, setCity] = useState("");
-  const [serachWeather, setSearchWeather] = useState(true);
+  const [country, setCountry] = useState("");
+  const [searchWeather, setSearchWeather] = useState(true);
 
-  useEffect(() => {
-    if (serachWeather) {
-      setSearchWeather(false);
-      let cityFromParam = searchParams.get("cityName") ?? "Liberec";
-      setCity(cityFromParam);
-      getForecastWeather(cityFromParam);
-    }
-  }, [serachWeather]);
-  const getForecastWeather = (cityName) => {
+  let params = new URLSearchParams(window.location.search);
+
+  const getLocation = async () => {
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      axios
+        .get(
+          LocationApi.getLocation +
+            "?latitude=" +
+            latitude +
+            "&longitude=" +
+            longitude,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "http://localhost:3000",
+            },
+          }
+        )
+        .then((response) => {
+          setError(null);
+          setCity(response.data.cityName);
+          setCountry(response.data.country);
+          setSearchWeather(!searchWeather);
+        })
+        .catch((error) => {
+          let cityFromParam = params.get("cityName") ?? "Praha";
+          let countryFromParam = params.get("country") ?? "Czechia";
+          setCity(cityFromParam);
+          setCountry(countryFromParam);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
+  };
+  const getForecast = () => {
     setLoading(true);
     axios
-      .get(WeatherApi.forecast + "?cityName=" + cityName, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
-          userToken: store.token ? store.token : "",
-        },
-      })
+      .get(
+        WeatherApi.forecast +
+          "?cityName=" +
+          city.replace(" ", "") +
+          "&country=" +
+          country.replace(" ", ""),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            userToken: store.token ? store.token : "",
+          },
+        }
+      )
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
           setWeather(response.data);
-          setLoading(false);
         }
       })
       .catch((error) => {
-        console.error(error);
-        setError(error.message);
-        setLoading(false);
+        setError(error);
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
+  useEffect(() => {
+    let cityFromParam = params.get("cityName") ?? "Praha";
+    let countryFromParam = params.get("country") ?? "Czech Republic";
+    setCity(cityFromParam);
+    setCountry(countryFromParam);
+    setSearchWeather(!searchWeather);
+  }, []);
+
+  useEffect(() => {
+    if (city !== "" && country !== "") {
+      getForecast();
+    }
+  }, [searchWeather]);
+
   const setSearchCity = () => {
-    searchParams.set("cityName", city);
-    setSearchWeather(true);
+    getForecast();
   };
 
   if (loading) {
     return <Loading />;
   }
   if (error) {
-    return <Message type="error" description={error} />;
+    return (
+      <Message type="error">
+        {error.message ? error.message : "Něco se pokazilo"}
+      </Message>
+    );
   }
   return (
     <Row>
@@ -82,6 +132,16 @@ export const ForecastWeather = () => {
             <MdOutlineSearch />
           </InputGroup.Button>
         </InputGroup>
+        <SelectPicker
+          value={country}
+          onChange={setCountry}
+          data={countries}
+          style={{ width: "242px" }}
+        />
+        <Divider>NEBO</Divider>
+        <Button appearance="primary" onClick={getLocation} block>
+          Použít aktuální polohu
+        </Button>
       </Col>
       <Col xs={24} sm={24} md={14} lg={17}>
         <h3 style={{ textAlign: "center" }}>Předpověď počasí pro {city}</h3>

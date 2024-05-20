@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OpenWeatherMap;
 using OpenWeatherMap.Models;
+using System.Globalization;
 using Weather.Models;
-using Weather.MyExceptions;
 using Weather.ViewModels;
 
 namespace Weather.Services
@@ -26,16 +27,12 @@ namespace Weather.Services
         };
 
 
-        public async Task<MyWeatherInfo> GetActualWeather(string cityName)
+        public async Task<MyWeatherInfo> GetActualWeather(string cityName, string country)
         {
             Location location;
             try
             {
-                location = await _locationTransformation.GetCoordinates(cityName);
-            }
-            catch (LocationException e)
-            {
-                throw new LocationException(e.Message);
+                location = await _locationTransformation.GetCoordinates(cityName, country);
             }
             catch (Exception e)
             {
@@ -61,16 +58,12 @@ namespace Weather.Services
             return myWeather;
         }
 
-        public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName)
+        public async Task<MyWeatherForecast> GetWeatherForecast5Days(string cityName, string country)
         {
             Location location;
             try
             {
-                location = await _locationTransformation.GetCoordinates(cityName);
-            }
-            catch (LocationException e)
-            {
-                throw new LocationException(e.Message);
+                location = await _locationTransformation.GetCoordinates(cityName, country);
             }
             catch (Exception e)
             {
@@ -107,6 +100,23 @@ namespace Weather.Services
                 });
             });
             return myWeatherForecast;
+        }
+
+        public async Task<HistoryWeather> GetWeatherHistory(Location location)
+        {
+            var client = new HttpClient();
+            var url = $"{Constants.HistoryWeatherEndpoint}?key={Constants.HistoryKey}&q={location.Latitude.ToString(CultureInfo.InvariantCulture)},{location.Longitude.ToString(CultureInfo.InvariantCulture)}&dt={DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")}&end_dt={DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")}";
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var text = await response.Content.ReadAsStringAsync();
+                var historyWeather = JsonConvert.DeserializeObject<HistoryWeather>(text);
+                return historyWeather;
+            }
+            else
+            {
+                throw new Exception("history not found");
+            }
         }
     }
 }

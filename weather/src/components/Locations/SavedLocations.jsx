@@ -14,7 +14,6 @@ import {
   Panel,
   Row,
 } from "rsuite";
-import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
 import { Link } from "react-router-dom";
 import { MdAddCircleOutline, MdOutlineModeEdit } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
@@ -33,7 +32,6 @@ export const SavedLocations = () => {
       .get(LocationApi.getAll, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
           userToken: store.token ? store.token : "",
         },
       })
@@ -52,7 +50,6 @@ export const SavedLocations = () => {
       .delete(LocationApi.basic + "?customName=" + customName, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
           userToken: store.token ? store.token : "",
         },
       })
@@ -83,7 +80,7 @@ export const SavedLocations = () => {
           <Col xs={24} sm={24} md={8} lg={8} xl={8} xxl={8}>
             <IconButton
               as={Link}
-              to={"/add-location"}
+              to={"/locations/add"}
               color="green"
               appearance="primary"
               icon={<MdAddCircleOutline size={36} />}
@@ -111,7 +108,12 @@ export const SavedLocations = () => {
                         color="violet"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/actual?local=false&cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Teď
                       </Button>
@@ -119,9 +121,27 @@ export const SavedLocations = () => {
                         color="blue"
                         appearance="primary"
                         as={Link}
-                        to={"/actual-weather?cityName=" + location.cityName}
+                        to={
+                          "/forecast?cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
                       >
                         Potom
+                      </Button>
+                      <Button
+                        color="orange"
+                        appearance="primary"
+                        as={Link}
+                        to={
+                          "/history?cityName=" +
+                          location.cityName +
+                          "&country=" +
+                          location.country
+                        }
+                      >
+                        Historie
                       </Button>
                       <IconButton
                         color="red"
