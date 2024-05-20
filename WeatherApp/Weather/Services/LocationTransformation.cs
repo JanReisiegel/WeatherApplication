@@ -67,10 +67,10 @@ namespace Weather.Services
                 "france" => "fr",
                 "morocco" => "ma",
                 "netherlands" => "nl",
-                "new zealand" => "nz",
+                "newzealand" => "nz",
                 "norway" => "no",
-                "united kingdom" => "gb",
-                "united states" => "us",
+                "unitedkingdom" => "gb",
+                "unitedstates" => "us",
                 _ => country,
             };
         }

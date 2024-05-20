@@ -1,18 +1,54 @@
 export const UserApi = {
-  basic: "https://localhost:7248/api/Users",
-  login: "https://localhost:7248/api/Users/login",
-  register: "https://localhost:7248/api/Users/register",
-  logout: "https://localhost:7248/api/Users/logout",
-  getOne: "https://localhost:7248/api/Users/one",
-  getAll: "https://localhost:7248/api/Users/all",
+  basic:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users",
+  login:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users/login",
+  register:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users/register",
+  logout:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users/logout",
+  getOne:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users/one",
+  getAll:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Users/all",
 };
 export const WeatherApi = {
-  current: "https://localhost:7248/api/Weather/actual",
-  forecast: "https://localhost:7248/api/Weather/forecast",
-  historical: "https://localhost:7248/api/Weather/history",
+  current:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Weather/actual",
+  forecast:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Weather/forecast",
+  historical:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Weather/history",
 };
 export const LocationApi = {
-  basic: "https://localhost:7248/api/Locations",
-  getAll: "https://localhost:7248/api/Locations/all",
-  getLocation: "https://localhost:7248/api/Locations/coords",
+  basic:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Locations",
+  getAll:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Locations/all",
+  getLocation:
+    (process.env.NODE_ENV === "development"
+      ? "https://localhost:7248"
+      : "https://stinweatherapi.azurewebsites.net") + "/api/Locations/coords",
 };

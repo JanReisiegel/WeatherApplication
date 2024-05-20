@@ -68,13 +68,19 @@ export const ForecastWeather = () => {
   const getForecast = () => {
     setLoading(true);
     axios
-      .get(WeatherApi.forecast + "?cityName=" + city + "&country=" + country, {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
-          userToken: store.token ? store.token : "",
-        },
-      })
+      .get(
+        WeatherApi.forecast +
+          "?cityName=" +
+          city.replace(" ", "") +
+          "&country=" +
+          country.replace(" ", ""),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            userToken: store.token ? store.token : "",
+          },
+        }
+      )
       .then((response) => {
         if (response.status === 200) {
           setWeather(response.data);
@@ -94,7 +100,7 @@ export const ForecastWeather = () => {
     setCity(cityFromParam);
     setCountry(countryFromParam);
     setSearchWeather(!searchWeather);
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (city !== "" && country !== "") {

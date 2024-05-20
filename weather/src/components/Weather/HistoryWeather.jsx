@@ -47,7 +47,6 @@ const HistoryWeather = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "http://localhost:3000",
             },
           }
         )
@@ -86,11 +85,14 @@ const HistoryWeather = () => {
     setLoading(true);
     axios
       .get(
-        WeatherApi.historical + "?cityName=" + city + "&country=" + country,
+        WeatherApi.historical +
+          "?cityName=" +
+          city.replace(" ", "") +
+          "&country=" +
+          country.replace(" ", ""),
         {
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:3000",
             userToken: store.token ? store.token : "",
           },
         }
@@ -113,7 +115,7 @@ const HistoryWeather = () => {
     return <Loading />;
   }
   if (error) {
-    return <Message type="error">{error.message}</Message>;
+    return <Message type="error">{error}</Message>;
   }
   return (
     <Row>
@@ -136,7 +138,9 @@ const HistoryWeather = () => {
           <>
             <InputGroup>
               <Input value={city} onChange={(e) => setCity(e)} />
-              <InputGroup.Button onClick={setCity}>
+              <InputGroup.Button
+                onClick={() => setSearchWeather(!searchWeather)}
+              >
                 <MdOutlineSearch />
               </InputGroup.Button>
             </InputGroup>

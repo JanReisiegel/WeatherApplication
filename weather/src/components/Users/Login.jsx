@@ -22,7 +22,6 @@ export const MenuLogin = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:3000",
           },
         }
       )
@@ -46,7 +45,6 @@ export const MenuLogin = () => {
       .get(UserApi.getOne, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
           userToken: token,
         },
       })

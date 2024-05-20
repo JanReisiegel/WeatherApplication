@@ -42,7 +42,7 @@ export const AddLocation = () => {
         console.error(error);
       })
       .finally(() => {
-        return navigate("/saved-locations");
+        return navigate("/locations");
       });
   };
 

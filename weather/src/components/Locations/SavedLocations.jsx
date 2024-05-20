@@ -14,7 +14,6 @@ import {
   Panel,
   Row,
 } from "rsuite";
-import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
 import { Link } from "react-router-dom";
 import { MdAddCircleOutline, MdOutlineModeEdit } from "react-icons/md";
 import { IoTrashOutline } from "react-icons/io5";
@@ -33,7 +32,6 @@ export const SavedLocations = () => {
       .get(LocationApi.getAll, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
           userToken: store.token ? store.token : "",
         },
       })
@@ -52,7 +50,6 @@ export const SavedLocations = () => {
       .delete(LocationApi.basic + "?customName=" + customName, {
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "http://localhost:3000",
           userToken: store.token ? store.token : "",
         },
       })
