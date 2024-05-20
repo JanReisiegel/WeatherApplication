@@ -121,18 +121,18 @@ const HistoryWeather = () => {
         <h3>Město</h3>
         <Toggle
           size="lg"
-          checkedChildren="Vybrat město"
-          unCheckedChildren="Použít aktuální"
+          checkedChildren="Použít aktuální polohu"
+          unCheckedChildren="Vybrat město"
           checked={local}
           onChange={() => {
             setLocal(!local);
-            if (local) {
+            if (!local) {
               getLocation();
             }
           }}
         />
         <Divider />
-        {local ? (
+        {!local ? (
           <>
             <InputGroup>
               <Input value={city} onChange={(e) => setCity(e)} />
