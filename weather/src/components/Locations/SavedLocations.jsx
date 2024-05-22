@@ -26,7 +26,7 @@ export const SavedLocations = () => {
 
   useEffect(() => {
     getSavedlocations();
-  });
+  }, []);
 
   const getSavedlocations = () => {
     setLoading(true);
