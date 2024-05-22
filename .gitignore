@@ -396,3 +396,8 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+#ignore database files
+*/weather.db
+*/weather.db-shm
+*/weather.db-wal
