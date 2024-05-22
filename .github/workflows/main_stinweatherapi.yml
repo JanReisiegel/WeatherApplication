@@ -66,4 +66,4 @@ jobs:
         with:
           app-name: "stinweatherapi"
           slot-name: "Production"
-          package: ./WeatherApp/
+          package: .

@@ -25,7 +25,7 @@ jobs:
         run: |
           cd weather
           npm install
-          CI=false npm run build --if-present
+          npm run build --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -61,4 +61,4 @@ jobs:
         with:
           app-name: "wather-app"
           slot-name: "Production"
-          package: ./weather/
+          package: .
