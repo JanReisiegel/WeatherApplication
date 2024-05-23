@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with: 
+        with:
           token: ${{secrets.GITHUB_TOKEN}}
 
       - name: Setup Node.js
@@ -43,6 +43,7 @@ jobs:
 
       - name: Build project
         run: |
+          cd weather
           npm run build
         working-directory: ./weather
 
