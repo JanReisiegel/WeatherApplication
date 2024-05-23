@@ -56,13 +56,12 @@ jobs:
           path: ./weather/build/
 
       - name: Deploy to GitHub Pages
-        id: deploy-to-github-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-
-      #  run: |
-      #    cd weather
-      #    npm install -g gh-pages
-      #    gh-pages -d build
+        #        id: deploy-to-github-pages
+        #       uses: peaceiris/actions-gh-pages@v3
+        #      with:
+        #       github_token: ${{ secrets.GITHUB_TOKEN }}
+        #      publish_dir: ./build
+        run: |
+          cd weather
+          npm install -g gh-pages
+          gh-pages -d build
