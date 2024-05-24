@@ -10,21 +10,31 @@ on:
 
 env:
   CI: false
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: "20.x"
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          cd weather
+          npm install
+          npm install -g gh-pages
 
       - name: Build applicatipon
         run: |
           ls -la
           cd weather
-          npm install
           npm run build
 
       - name: Deploy Aplication to Github Pages
