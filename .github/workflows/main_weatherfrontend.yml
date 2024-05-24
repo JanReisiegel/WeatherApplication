@@ -43,6 +43,7 @@ jobs:
           npm run build
 
       - name: Deploy Aplication to Github Pages
-        run: |
-          cd weather
-          npm run deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./weather/build
