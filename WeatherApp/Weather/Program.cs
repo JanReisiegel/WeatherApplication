@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy("corsdef", policy =>
         {
-            policy.WithOrigins("https://weatherfrontend.azurewebsites.net")
+            policy.WithOrigins("https://janreisiegel.github.io/")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
