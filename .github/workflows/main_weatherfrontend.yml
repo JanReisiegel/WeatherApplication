@@ -26,14 +26,14 @@ jobs:
       - name: Uninstall dev dependencies
         run: |
           cd Weather
-          npm prune --production
+          pnpm prune --production
 
       - name: npm install, build, and test
         run: |
           cd weather
-          npm install
+          pnpm install
           set CI=false
-          npm run build --if-present
+          pnpm run build --if-present
         #  npm run test --if-present
 
       - name: Upload artifact for deployment job
