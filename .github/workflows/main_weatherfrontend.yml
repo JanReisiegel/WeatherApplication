@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Build applicatipon
         run: |
+          ls -al
           cd weather
           npm install
           npm run build
