@@ -22,6 +22,7 @@ jobs:
 
       - name: Build applicatipon
         run: |
+          ls -la
           cd weather
           npm install
           npm run build
