@@ -23,6 +23,11 @@ jobs:
         with:
           node-version: "20.x"
 
+      - name: Uninstall dev dependencies
+        run: |
+          cd Weather
+          npm prune --production
+
       - name: npm install, build, and test
         run: |
           cd weather
