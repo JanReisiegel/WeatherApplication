@@ -20,11 +20,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Configure Git
-        run: |
-          git config --global user.email jan.reisiegel@tul.com
-          git config --global user.name janreisiegel
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
@@ -42,7 +37,15 @@ jobs:
           cd weather
           npm run build
 
-      - name: Deploy Aplication to Github Pages
+      - name: Configure Git
         run: |
+          git config --global user.email jan.reisiegel@tul.com
+          git config --global user.name janreisiegel
+
+      - name: Deploy Aplication to Github Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           cd weather
           npm run deploy
