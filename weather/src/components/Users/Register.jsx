@@ -26,6 +26,7 @@ export const MenuRegister = () => {
         {
           headers: {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
           },
         }
       )

@@ -45,6 +45,7 @@ export const MenuLogin = () => {
       .get(UserApi.getOne, {
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
           userToken: token,
         },
       })

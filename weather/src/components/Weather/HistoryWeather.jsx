@@ -46,6 +46,7 @@ const HistoryWeather = () => {
           {
             headers: {
               "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
             },
           }
         )
@@ -92,6 +93,7 @@ const HistoryWeather = () => {
         {
           headers: {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
             userToken: store.token ? store.token : "",
           },
         }

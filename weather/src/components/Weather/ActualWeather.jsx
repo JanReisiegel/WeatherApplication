@@ -45,6 +45,7 @@ const ActualWeather = () => {
           {
             headers: {
               "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
             },
           }
         )
@@ -91,6 +92,7 @@ const ActualWeather = () => {
       .get(WeatherApi.current + "?cityName=" + city + "&country=" + country, {
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
           userToken: store.token ? store.token : "",
         },
       })

@@ -27,7 +27,7 @@ export const AddLocation = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "http://localhost:3000",
+            "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
             userToken: store.token ? store.token : "",
           },
         }

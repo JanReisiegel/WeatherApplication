@@ -34,6 +34,7 @@ export const SavedLocations = () => {
       .get(LocationApi.getAll, {
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
           userToken: store.token ? store.token : "",
         },
       })
@@ -55,6 +56,7 @@ export const SavedLocations = () => {
       .delete(LocationApi.basic + "?customName=" + customName, {
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "https://janreisiegel.github.io/",
           userToken: store.token ? store.token : "",
         },
       })

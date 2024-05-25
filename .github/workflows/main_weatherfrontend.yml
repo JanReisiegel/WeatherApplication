@@ -22,8 +22,8 @@ jobs:
 
       - name: Configure Git
         run: |
-          git config user.email jan.reisiegel@tul.com
-          git config user.name janreisiegel
+          git config --global user.email jan.reisiegel@tul.com
+          git config --global user.name janreisiegel
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
