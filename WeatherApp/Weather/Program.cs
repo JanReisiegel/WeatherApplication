@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
     {
         options.AddPolicy("corsdef", policy =>
         {
-            policy.WithOrigins("https://janreisiegel.github.io/")
+            policy.AllowAnyOrigin()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
