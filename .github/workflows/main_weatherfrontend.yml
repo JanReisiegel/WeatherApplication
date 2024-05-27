@@ -40,7 +40,7 @@ jobs:
       - name: Configure Git
         run: |
           git config --global user.email jan.reisiegel@tul.com
-          git config --global user.name janreisiegel
+          git config --global user.name JanReisiegel
 
       - name: Deploy Aplication to Github Pages
         run: |
